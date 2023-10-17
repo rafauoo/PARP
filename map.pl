@@ -6,7 +6,6 @@
 
 
 describe(a1) :- write('You are in forest.'), nl.
-
 path(a1, e, a2).
 path(a1, s, b1).
 
@@ -401,3 +400,23 @@ describe(g7) :- write('You are in swamp.'), nl.
 
 path(g7, n, f7).
 path(g7, w, g6).
+
+
+% Monsters
+monster(a1, 'MiniBoss Druid', 2).
+monster(a7, 'Final Boss - Bad Spirit', 5).
+monster(b2, 'Elf', 1).
+monster(b3, 'Wolf', 1).
+monster(b5, 'MiniBoss - Goblin', 4).
+monster(b6, 'Goblin', 1).
+monster(c2, 'Elf', 1).
+monster(c6, 'Goblin', 1).
+monster(e2, 'Lion', 1).
+monster(e6, 'Drowned', 1).
+monster(g1, 'Undead Priest', 3).
+monster(g5, 'Naiad', 1).
+monster(g7, 'Drowned', 10).
+monster(a4, 'River spirit', 0).
+lvlup(c2).
+lvlup(f2).
+lvlup(a4).
