@@ -87,6 +87,10 @@ instructions :-
 start :-
     assert(i_am_at(d4)),
     assert(player_weapon_level(1)),
-    write('In a realm veiled by ancient lore, three guardians protected fragments of a mysterious key. Druid guarded the forest, the Undead Priest watched over the temple, and a formidable Goblin held the key fragment in treacherous caves. Legends whispered of an elusive entity, the Ephemeral Phantom, residing in the abandoned house, said to hold the power to shape the realm\'s destiny. Only a brave soul could confront this being and determine the realm\'s fate.'),
+    write('In a realm veiled by ancient lore, three guardians protected fragments of a mysterious key.'), nl,
+    write('Druid guarded the forest, the Undead Priest watched over the temple, and a formidable Goblin held the key fragment in treacherous caves.'), nl,
+    write('Legends whispered of an elusive entity, the Ephemeral Phantom, residing in the abandoned house, said to hold the power to shape the realm\'s destiny.'), nl, 
+    write('Only a brave soul could confront this being and determine the realm\'s fate.'), nl,
     instructions,
-    look.
+    look,
+    write('New quest added: Collect 3 key fragments.'), nl.
