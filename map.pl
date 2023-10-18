@@ -437,3 +437,9 @@ monster(a4, 'River spirit', 0).
 lvlup(c2).
 lvlup(f2).
 lvlup(a4).
+
+%keys
+key(a1, key1).
+key(g1, key2).
+key(b5, key3).
+

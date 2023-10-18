@@ -1,9 +1,11 @@
 :- dynamic i_am_at/1.
 :- dynamic monster/3.
+:- dynamic equipment/1.
 :- dynamic player_weapon_level/1.
 :- retractall(i_am_at(_)).
+:- retractall(equipment(_)).
 :- consult(map).
-:- consult(display_map).
+% :- consult(display_map).
 
 respawn :-
     i_am_at(Here),
@@ -23,13 +25,21 @@ combat(Monster) :-
         PlayerWeaponLevel >= MonsterLevel ->
         write('You have defeated the '), write(Monster), write(' with your weapon level '), write(PlayerWeaponLevel), write('!'), nl,
         retract(monster(Loc, Monster, MonsterLevel)),
-        (   lvlup(Loc) ->
+        (
+            lvlup(Loc) ->
             retract(player_weapon_level(PlayerWeaponLevel)),
             NewLevel is PlayerWeaponLevel + 1,
             assert(player_weapon_level(NewLevel)),
             write('WEAPON UPGRADE FOUND!!!'), nl,
             write('Your weapon has been upgraded to level '), write(NewLevel), nl
         ;   true
+        ),
+        (   
+            key(Loc, Key) -> 
+            write('You have found a '), write(Key), nl,
+            assert(equipment(Key)),
+            write('You have taken the '), write(Key), nl
+            ;   true
         )
         % Add further logic for gaining experience or other rewards
         ;
@@ -58,6 +68,17 @@ e :- go(e).
 w :- go(w).
 
 
+bag :- 
+    write('Your equipment: '), nl,
+    findall(Item, equipment(Item), Equipment_list),
+    write_equipment(Equipment_list).
+
+write_equipment([]).
+write_equipment([Item|Rest]) :-  % bierze pierwszy item który znajdzie i wypisuje
+    write('- '), write(Item), nl,
+    write_equipment(Rest).  % rekurencyjnie wypisuje dla reszty itemów
+
+
 /* This rule tells how to move in a given direction. */
 
 go(Direction) :-
@@ -78,6 +99,7 @@ instructions :-
     write('n.  s.  e.  w.     -- to go in that direction.'), nl,
     write('look.              -- to look around you again.'), nl,
     write('instructions.      -- to see this message again.'), nl,
+    write('bag                -- to see your equipment'), nl,
     write('halt.              -- to end the game and quit.'), nl,
     nl.
 
