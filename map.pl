@@ -374,15 +374,15 @@ path(g2, w, g1).
 
 describe(g4) :- exeter.
 
-path(g4, w, g5).
+path(g4, e, g5).
 
 % G5 - Swamp [Naiad lvl1]
 
 
 describe(g5) :- swamp.
 
-path(g5, w, g6).
-path(g5, e, g4).
+path(g5, w, g4).
+path(g5, e, g6).
 
 % G6 - Swamp
 
