@@ -402,20 +402,20 @@ path(g7, n, f7).
 path(g7, w, g6).
 
 % Fields descriptions
-forest :- write('You are in forest.'), nl.
-mountain :- write('You are in mountains.'), nl.
-river_src :- write('You are in river source.'), nl.
-valley :- write('You are in valley.'), nl.
-abandoned_house :- write('You are in abandoned house.'), nl.
-cave :- write('You are in cave.'), nl.
-savanna :- write('You are in savanna.'), nl.
-swamp :- write('You are in swamp.'), nl.
-desert :- write('You are in dessert.'), nl.
-anyor :- write('You are in Anyor.'), nl.
-fields :- write('You are in fields.'), nl.
-temple :- write('You are in temple.'), nl.
-bridge :- write('You are in bridge.'), nl.
-exeter :- write('You are in Exeter.'), nl.
+forest :- write('forest.'), nl.
+mountain :- write('mountains.'), nl.
+river_src :- write('source.'), nl.
+valley :- write('valley.'), nl.
+abandoned_house :- write('abandoned house.'), nl.
+cave :- write('cave.'), nl.
+savanna :- write('savanna.'), nl.
+swamp :- write('swamp.'), nl.
+desert :- write('dessert.'), nl.
+anyor :- write('Anyor.'), nl.
+fields :- write('fields.'), nl.
+temple :- write('temple.'), nl.
+bridge :- write('bridge.'), nl.
+exeter :- write('Exeter.'), nl.
 
 
 % Monsters
@@ -441,4 +441,4 @@ lvlup(a4).
 %keys
 key(a1, heartwood_key).
 key(g1, divine_sigil_key).
-key(b5, stoneheartkey).
+key(b5, stoneheart_key).

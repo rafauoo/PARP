@@ -50,7 +50,7 @@ combat(Monster) :-
 /* This rule just writes out game instructions. */
 look :-
     i_am_at(Place),
-    describe(Place),
+    write('You are in '), describe(Place),
     write('You are at '), write(Place), nl,
     (   monster(Place, Monster, Level) ->
     write('A wild '), write(Monster), write(' [lvl '), write(Level), write('] appears!'), nl,
@@ -89,7 +89,17 @@ go(Direction) :-
         !, look.
 
 go(_) :-
-        write('You can''t go that way.').
+        write('You can\'t go that way.'), nl.
+
+
+look(Direction) :-
+        i_am_at(Here),
+        path(Here, Direction, There),
+        write('You are looking at '), describe(There), nl,
+        !.
+
+look(_) :-
+        write('You can\'t go that way.'), nl.
 
 instructions :-
     nl,
@@ -99,7 +109,7 @@ instructions :-
     write('n.  s.  e.  w.     -- to go in that direction.'), nl,
     write('look.              -- to look around you again.'), nl,
     write('instructions.      -- to see this message again.'), nl,
-    write('bag                -- to see your equipment'), nl,
+    write('bag.               -- to see your equipment'), nl,
     write('halt.              -- to end the game and quit.'), nl,
     nl.
 
