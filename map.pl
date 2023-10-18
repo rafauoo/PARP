@@ -439,7 +439,6 @@ lvlup(f2).
 lvlup(a4).
 
 %keys
-key(a1, key1).
-key(g1, key2).
-key(b5, key3).
-
+key(a1, heartwood_key).
+key(g1, divine_sigil_key).
+key(b5, stoneheartkey).
