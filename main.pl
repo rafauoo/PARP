@@ -108,6 +108,7 @@ instructions :-
     write('start.             -- to start the game.'), nl,
     write('n.  s.  e.  w.     -- to go in that direction.'), nl,
     write('look.              -- to look around you again.'), nl,
+    write('look(Direction).   -- to look in one of four directions'), nl,
     write('instructions.      -- to see this message again.'), nl,
     write('bag.               -- to see your equipment'), nl,
     write('halt.              -- to end the game and quit.'), nl,
