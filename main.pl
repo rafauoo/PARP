@@ -2,6 +2,7 @@
 :- dynamic monster/3.
 :- dynamic equipment/1.
 :- dynamic player_weapon_level/1.
+:- dynamic can_upgrade/1.
 :- retractall(i_am_at(_)).
 :- retractall(equipment(_)).
 :- consult(map).
@@ -15,6 +16,55 @@ respawn :-
     write('Local medic has found your body and brang to Anyor!'), nl,
     look.
 
+
+try_unlock_Exeter :-
+    player_weapon_level(Level),
+    (
+        Level = 4 ->
+        assert(path(g5, w, g4)),  % Add possibility to entry to Exeter
+        nl, write("Unlocked Exeter"), nl
+        ;true    
+    ).
+
+
+try_unlock_Final_Boss :-
+    (
+        has_all_keys ->
+        assert(path(a6, e, a7)),
+        nl, write("Unlocked Final Boss"), nl
+        ;true
+    ).
+
+
+upgrade :-
+    i_am_at(Loc),
+    (
+        lvlup(Loc) ->
+        can_upgrade(Value),
+        retract(player_weapon_level(PlayerWeaponLevel)),
+        NewLevel is PlayerWeaponLevel + 1,
+        retract(lvlup(Loc)),
+        assert(player_weapon_level(NewLevel)),
+        try_unlock_Exeter,
+        write('WEAPON UPGRADE FOUND!!!'), nl,
+        write('Your weapon has been upgraded to level '), write(NewLevel), nl
+        ;true
+    ),
+    retract(can_upgrade(Value)).
+
+
+take_key :-
+    i_am_at(Loc),
+    (   
+        key(Loc, Key) -> 
+        write('You have found a '), write(Key), nl,
+        assert(equipment(Key)),
+        write('You have taken the '), write(Key), nl,
+        try_unlock_Final_Boss;
+        true
+    ).
+
+
 combat(Monster) :-
     % Your combat logic here
     write('You are battling '), write(Monster), nl,
@@ -25,36 +75,9 @@ combat(Monster) :-
         PlayerWeaponLevel >= MonsterLevel ->
         write('You have defeated the '), write(Monster), write(' with your weapon level '), write(PlayerWeaponLevel), write('!'), nl,
         retract(monster(Loc, Monster, MonsterLevel)),
-        (
-            lvlup(Loc) ->
-            retract(player_weapon_level(PlayerWeaponLevel)),
-            NewLevel is PlayerWeaponLevel + 1,
-            assert(player_weapon_level(NewLevel)),
-            write('WEAPON UPGRADE FOUND!!!'), nl,
-            write('Your weapon has been upgraded to level '), write(NewLevel), nl,
-            (
-                NewLevel = 4 ->
-                assert(path(g5, w, g4)),  % Add possibility to entry to Exeter
-                nl, write("Unlocked Exeter"), nl
-                ;true    
-            )
-            ;true
-        ),
-        (   
-            key(Loc, Key) -> 
-            write('You have found a '), write(Key), nl,
-            assert(equipment(Key)),
-            write('You have taken the '), write(Key), nl,
-            (
-                has_all_keys ->
-                assert(path(a6, e, a7)),
-                nl, write("Unlocked Final Boss"), nl
-                ;true
-            )
-            ;true
-        )
-        % Add further logic for gaining experience or other rewards
-        ;
+        assert(can_upgrade(yes)),
+        upgrade,
+        take_key;
         write('You were defeated by the '), write(Monster), nl,
         respawn
     ).
@@ -103,7 +126,6 @@ has_all_keys :-
 go(Direction) :-
         i_am_at(Here),
         path(Here, Direction, There),
-        
         retract(i_am_at(Here)),
         assert(i_am_at(There)),
         !, look.

@@ -1,6 +1,7 @@
 :- discontiguous describe/1.
 :- discontiguous path/3.
 :- dynamic path/3.
+:- dynamic lvlup/1.
 % ==============================
 % ROW A
 % A1 - Forest [key] [MiniBoss Druid lvl2]
@@ -438,6 +439,7 @@ monster(a4, 'River spirit', 0).
 lvlup(c2).
 lvlup(f2).
 lvlup(a4).
+lvlup(g4).
 
 %keys
 key(a1, 'Heartwood Key').
