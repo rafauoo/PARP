@@ -31,15 +31,27 @@ combat(Monster) :-
             NewLevel is PlayerWeaponLevel + 1,
             assert(player_weapon_level(NewLevel)),
             write('WEAPON UPGRADE FOUND!!!'), nl,
-            write('Your weapon has been upgraded to level '), write(NewLevel), nl
-        ;   true
+            write('Your weapon has been upgraded to level '), write(NewLevel), nl,
+            (
+                NewLevel = 4 ->
+                assert(path(g5, w, g4)),  % Add possibility to entry to Exeter
+                nl, write("Unlocked Exeter"), nl
+                ;true    
+            )
+            ;true
         ),
         (   
             key(Loc, Key) -> 
             write('You have found a '), write(Key), nl,
             assert(equipment(Key)),
-            write('You have taken the '), write(Key), nl
-            ;   true
+            write('You have taken the '), write(Key), nl,
+            (
+                has_all_keys ->
+                assert(path(a6, e, a7)),
+                nl, write("Unlocked Final Boss"), nl
+                ;true
+            )
+            ;true
         )
         % Add further logic for gaining experience or other rewards
         ;
@@ -71,7 +83,7 @@ w :- go(w).
 bag :- 
     write('Your equipment: '), nl,
     findall(Item, equipment(Item), Equipment_list),
-    write_equipment(Equipment_list).
+    write_equipment(Equipment_list), nl.
 
 write_equipment([]).
 write_equipment([Item|Rest]) :-  % bierze pierwszy item który znajdzie i wypisuje
@@ -79,11 +91,19 @@ write_equipment([Item|Rest]) :-  % bierze pierwszy item który znajdzie i wypisu
     write_equipment(Rest).  % rekurencyjnie wypisuje dla reszty itemów
 
 
+has_all_keys :-
+    findall(Key, equipment(Key), Keys),
+    length(Keys, Number_of_keys),
+    Number_of_keys = 3.
+    
+
+
 /* This rule tells how to move in a given direction. */
 
 go(Direction) :-
         i_am_at(Here),
         path(Here, Direction, There),
+        
         retract(i_am_at(Here)),
         assert(i_am_at(There)),
         !, look.

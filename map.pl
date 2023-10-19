@@ -1,5 +1,6 @@
 :- discontiguous describe/1.
 :- discontiguous path/3.
+:- dynamic path/3.
 % ==============================
 % ROW A
 % A1 - Forest [key] [MiniBoss Druid lvl2]
@@ -381,7 +382,7 @@ path(g4, e, g5).
 
 describe(g5) :- swamp.
 
-path(g5, w, g4).
+% path(g5, w, g4).  % Locked
 path(g5, e, g6).
 
 % G6 - Swamp
@@ -439,6 +440,6 @@ lvlup(f2).
 lvlup(a4).
 
 %keys
-key(a1, heartwood_key).
-key(g1, divine_sigil_key).
-key(b5, stoneheart_key).
+key(a1, 'Heartwood Key').
+key(g1, 'Divine Sigil Key').
+key(b5, 'Stoneheart Key').
