@@ -40,24 +40,27 @@ upgrade :-
     i_am_at(Loc),
     (
         lvlup(Loc) ->
-        can_upgrade(Value),
-        retract(player_weapon_level(PlayerWeaponLevel)),
-        NewLevel is PlayerWeaponLevel + 1,
-        retract(lvlup(Loc)),
-        assert(player_weapon_level(NewLevel)),
-        try_unlock_Exeter,
-        write('WEAPON UPGRADE FOUND!!!'), nl,
-        write('Your weapon has been upgraded to level '), write(NewLevel), nl
+        (
+            can_upgrade(Value) ->
+            retract(player_weapon_level(PlayerWeaponLevel)),
+            NewLevel is PlayerWeaponLevel + 1,
+            retract(lvlup(Loc)),
+            assert(player_weapon_level(NewLevel)),
+            nl, write('WEAPON UPGRADE FOUND!!!'), nl,
+            write('Your weapon has been upgraded to level '), write(NewLevel), nl,
+            try_unlock_Exeter,
+            retract(can_upgrade(Value))
+            ;true
+        )
         ;true
-    ),
-    retract(can_upgrade(Value)).
+    ).
 
 
 take_key :-
     i_am_at(Loc),
     (   
         key(Loc, Key) -> 
-        write('You have found a '), write(Key), nl,
+        nl, write('You have found a '), write(Key), nl,
         assert(equipment(Key)),
         write('You have taken the '), write(Key), nl,
         try_unlock_Final_Boss;
@@ -76,7 +79,6 @@ combat(Monster) :-
         write('You have defeated the '), write(Monster), write(' with your weapon level '), write(PlayerWeaponLevel), write('!'), nl,
         retract(monster(Loc, Monster, MonsterLevel)),
         assert(can_upgrade(yes)),
-        upgrade,
         take_key;
         write('You were defeated by the '), write(Monster), nl,
         respawn
@@ -87,10 +89,16 @@ look :-
     i_am_at(Place),
     write('You are in '), describe(Place),
     write('You are at '), write(Place), nl,
-    (   monster(Place, Monster, Level) ->
-    write('A wild '), write(Monster), write(' [lvl '), write(Level), write('] appears!'), nl,
-    combat(Monster)
-    ;   true
+    (   
+        monster(Place, Monster, Level) ->
+        write('A wild '), write(Monster), write(' [lvl '), write(Level), write('] appears!'), nl,
+        combat(Monster)
+        ;true
+    ),
+    (
+        lvlup(Place) ->
+        upgrade;
+        true
     ),
     nl.
 
@@ -128,6 +136,11 @@ go(Direction) :-
         path(Here, Direction, There),
         retract(i_am_at(Here)),
         assert(i_am_at(There)),
+        (
+            There = g4 ->
+            assert(can_upgrade(yes));
+            true
+        ),
         !, look.
 
 go(_) :-
