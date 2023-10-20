@@ -1,5 +1,6 @@
 :- discontiguous describe/1.
 :- discontiguous path/3.
+:- discontiguous monster/3.
 :- dynamic path/3.
 :- dynamic lvlup/1.
 % ==============================
@@ -422,7 +423,7 @@ exeter :- write('Exeter.'), nl.
 
 % Monsters
 monster(a1, 'MiniBoss - Druid', 2).
-monster(a7, 'FINAL BOSS - Ephemeral Phantom', 5).
+boss_monster(a7, 'FINAL BOSS - Ephemeral Phantom', 5).
 monster(b2, 'Elf', 1).
 monster(b3, 'Wolf', 1).
 monster(b5, 'MiniBoss - Goblin', 4).
@@ -445,3 +446,5 @@ lvlup(g4).
 key(a1, 'Heartwood Key').
 key(g1, 'Divine Sigil Key').
 key(b5, 'Stoneheart Key').
+
+char(d4, 'jake').

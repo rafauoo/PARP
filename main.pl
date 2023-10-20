@@ -1,8 +1,10 @@
 :- dynamic i_am_at/1.
 :- dynamic monster/3.
+:- dynamic boss_monster/3.
 :- dynamic equipment/1.
 :- dynamic player_weapon_level/1.
 :- dynamic can_upgrade/1.
+:- dynamic chat/2.
 :- retractall(i_am_at(_)).
 :- retractall(equipment(_)).
 :- consult(map).
@@ -16,22 +18,42 @@ respawn :-
     write('Local medic has found your body and brang to Anyor!'), nl,
     look.
 
-
-try_unlock_Exeter :-
+try_lvl5 :-
     player_weapon_level(Level),
     (
-        Level = 4 ->
-        assert(path(g5, w, g4)),  % Add possibility to entry to Exeter
-        nl, write("Unlocked Exeter"), nl
-        ;true    
+        Level = 5 ->
+        retractall(chat(quest, _)),
+        write('NEW QUEST ADDED: Kill Empheral Phantom.'), nl,
+        assert(chat(quest, 'Kill Empheral Phantom.'))
+        ;
+        true
     ).
 
+try_unlock_Exeter :-
+    assert(path(g5, w, g4)),  % Add possibility to entry to Exeter
+    nl, write("Unlocked Exeter"), nl.
+
+talking_to_jake_next_exeter :-
+    chat(quest, Desc),
+    (
+        Desc = 'Talk to Jake in Anyor.' ->
+        retractall(chat(quest, _)),
+        try_unlock_Exeter,
+        write('NEW QUEST ADDED: Find Exeter to get a better weapon.'), nl,
+        assert(chat(quest, 'Find Exeter to get a better weapon.'))
+        ;true    
+    ).
 
 try_unlock_Final_Boss :-
     (
         has_all_keys ->
         assert(path(a6, e, a7)),
-        nl, write("Unlocked Final Boss"), nl
+        nl, write("Unlocked Final Boss"), nl,
+        retractall(chat(quest, _)),
+        write('NEW QUEST ADDED: Talk to Jake in Anyor.'), nl,
+        assert(chat(quest, 'Talk to Jake in Anyor.')),
+        retractall(chat(jake, _)),
+        assert(chat(jake, 'So it is true. You need to prepare. Find Exeter to get a better weapon.'))
         ;true
     ).
 
@@ -39,20 +61,17 @@ try_unlock_Final_Boss :-
 upgrade :-
     i_am_at(Loc),
     (
-        lvlup(Loc) ->
-        (
-            can_upgrade(Value) ->
-            retract(player_weapon_level(PlayerWeaponLevel)),
-            NewLevel is PlayerWeaponLevel + 1,
-            retract(lvlup(Loc)),
-            assert(player_weapon_level(NewLevel)),
-            nl, write('WEAPON UPGRADE FOUND!!!'), nl,
-            write('Your weapon has been upgraded to level '), write(NewLevel), nl,
-            try_unlock_Exeter,
-            retract(can_upgrade(Value))
-            ;true
-        )
-        ;true
+        can_upgrade(Value) ->
+        retract(player_weapon_level(PlayerWeaponLevel)),
+        NewLevel is PlayerWeaponLevel + 1,
+        retract(lvlup(Loc)),
+        assert(player_weapon_level(NewLevel)),
+        nl, write('WEAPON UPGRADE FOUND!!!'), nl,
+        write('Your weapon has been upgraded to level '), write(NewLevel), nl,
+        try_lvl5,
+        retract(can_upgrade(Value))
+        ;
+        true
     ).
 
 
@@ -66,10 +85,24 @@ take_key :-
         try_unlock_Final_Boss;
         true
     ).
-
+boss_combat(Monster) :-
+    write('You are battling '), write(Monster), nl,
+    player_weapon_level(PlayerWeaponLevel),
+    i_am_at(Loc),
+    boss_monster(Loc, Monster, MonsterLevel),
+    (
+        PlayerWeaponLevel >= MonsterLevel ->
+        write('You have defeated the '), write(Monster), write(' with your weapon level '), write(PlayerWeaponLevel), write('!'), nl,
+        retract(boss_monster(Loc, Monster, MonsterLevel)),
+        retractall(chat(quest, _)),
+        write('YOU FINISHED A GAME. CONGRATULATIONS!'), nl, nl, nl,
+        halt
+        ;
+        write('You were defeated by the '), write(Monster), nl,
+        respawn
+    ).
 
 combat(Monster) :-
-    % Your combat logic here
     write('You are battling '), write(Monster), nl,
     player_weapon_level(PlayerWeaponLevel),
     i_am_at(Loc),
@@ -78,11 +111,25 @@ combat(Monster) :-
         PlayerWeaponLevel >= MonsterLevel ->
         write('You have defeated the '), write(Monster), write(' with your weapon level '), write(PlayerWeaponLevel), write('!'), nl,
         retract(monster(Loc, Monster, MonsterLevel)),
+        retractall(can_upgrade(_)),
         assert(can_upgrade(yes)),
         take_key;
         write('You were defeated by the '), write(Monster), nl,
         respawn
     ).
+list_characters_at(Place) :-
+    findall(Character, char(Place, Character), Characters),
+    (
+        Characters \= [] ->
+        write('Characters present: '), nl,
+        write_characters(Characters)
+        ; true
+    ).
+
+write_characters([]).
+write_characters([Character|Rest]) :-
+    write(Character), nl,
+    write_characters(Rest).
 
 /* This rule just writes out game instructions. */
 look :-
@@ -95,11 +142,18 @@ look :-
         combat(Monster)
         ;true
     ),
+    (   
+        boss_monster(Place, Monster, Level) ->
+        write('BOSS APPEARED: '), write(Monster), write(' [lvl '), write(Level), write(']'), nl,
+        boss_combat(Monster)
+        ;true
+    ),
     (
         lvlup(Place) ->
         upgrade;
         true
     ),
+    list_characters_at(Place),
     nl.
 
 n :- go(n).
@@ -138,6 +192,7 @@ go(Direction) :-
         assert(i_am_at(There)),
         (
             There = g4 ->
+            retractall(can_upgrade(_)),
             assert(can_upgrade(yes));
             true
         ),
@@ -156,6 +211,30 @@ look(Direction) :-
 look(_) :-
         write('You can\'t go that way.'), nl.
 
+quest :-
+    write("CURRENT QUEST: "),
+    chat(quest, Desc),
+    write(Desc).
+
+talk(Person) :-
+    i_am_at(Loc),
+    char(Loc, EPerson) ->
+        (
+            EPerson = Person ->
+            (   EPerson = 'jake' ->
+                    chat(EPerson, Desc),
+                    talking_to_jake_next_exeter,
+                    write(Desc), nl
+                ;
+                    chat(EPerson, Desc),
+                    write(Desc), nl
+            )
+            ;
+            write("Cannot talk to him!"), nl
+        )
+    ;
+    write("Cannot talk to him!"), nl.
+
 instructions :-
     nl,
     write('Enter commands using standard Prolog syntax.'), nl,
@@ -166,6 +245,8 @@ instructions :-
     write('look(Direction).   -- to look in one of four directions'), nl,
     write('instructions.      -- to see this message again.'), nl,
     write('bag.               -- to see your equipment'), nl,
+    write('talk(Person).      -- to talk to Person'), nl,
+    write('quest.             -- to see your quests'), nl,
     write('halt.              -- to end the game and quit.'), nl,
     nl.
 
@@ -179,6 +260,8 @@ start :-
     write('Druid guarded the forest, the Undead Priest watched over the temple, and a formidable Goblin held the key fragment in treacherous caves.'), nl,
     write('Legends whispered of an elusive entity, the Ephemeral Phantom, residing in the abandoned house, said to hold the power to shape the realm\'s destiny.'), nl, 
     write('Only a brave soul could confront this being and determine the realm\'s fate.'), nl,
+    assert(chat(jake, 'Is it only a legend? Perhaps...')),
     instructions,
+    assert(chat(quest, 'Collect 3 key fragments.')),
     look,
-    write('New quest added: Collect 3 key fragments.'), nl.
+    write('NEW QUEST ADDED: Collect 3 key fragments.'), nl.
