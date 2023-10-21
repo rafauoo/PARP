@@ -318,7 +318,6 @@ describe(f2) :- desert.
 
 path(f2, s, g2).
 path(f2, n, e2).
-path(f2, e, f3).
 path(f2, w, f1).
 
 % F3 - River
