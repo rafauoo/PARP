@@ -318,7 +318,6 @@ describe(f2) :- desert.
 
 path(f2, s, g2).
 path(f2, n, e2).
-path(f2, e, f3).
 path(f2, w, f1).
 
 % F3 - River
@@ -340,7 +339,7 @@ describe(f6) :- swamp.
 
 path(f6, s, g6).
 path(f6, n, e6).
-path(f6, w, f5).
+path(f6, e, f7).
 
 % F7 - Swamp
 
@@ -413,7 +412,7 @@ abandoned_house :- write('abandoned house.'), nl.
 cave :- write('cave.'), nl.
 savanna :- write('savanna.'), nl.
 swamp :- write('swamp.'), nl.
-desert :- write('dessert.'), nl.
+desert :- write('desert.'), nl.
 anyor :- write('Anyor.'), nl.
 fields :- write('fields.'), nl.
 temple :- write('temple.'), nl.
