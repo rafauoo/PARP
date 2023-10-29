@@ -3,7 +3,8 @@ data Direction = North | South | East | West deriving (Show, Eq)
 
 type Location = String
 type Connection = (Location, Direction, Location)
-
+type Desc = (Location, String)
+type Description = [Desc]
 type WorldMap = [Connection]
 
 worldMap :: WorldMap
@@ -120,4 +121,49 @@ worldMap =
     ("g6", East, "g7"),
     ("g7", North, "f7"),
     ("g7", West, "g6")
+  ]
+
+descriptions :: Description
+descriptions = [
+    ("a1", "Forest"),
+    ("a2", "Forest"),
+    ("a3", "Mountains"),
+    ("a4", "Mountains"),
+    ("a5", "Mountains"),
+    ("a6", "Valley"),
+    ("a7", "Abandoned house"),
+    ("b1", "Forest"),
+    ("b2", "Forest"),
+    ("b3", "Forest"),
+    ("b5", "Cave"),
+    ("b6", "Valley"),
+    ("b7", "Mountains"),
+    ("c1", "Forest"),
+    ("c2", "Forest"),
+    ("c3", "Forest"),
+    ("c6", "Valley"),
+    ("c7", "Valley"),
+    ("d1", "Savanna"),
+    ("d2", "Forest"),
+    ("d3", "Forest"),
+    ("d4", "Aynor Village"),
+    ("d6", "Savanna"),
+    ("d7", "Savanna"),
+    ("e1", "Savanna"),
+    ("e2", "Savanna"),
+    ("e3", "Fields"),
+    ("e4", "Fields"),
+    ("e5", "Bridge"),
+    ("e6", "Swamp"),
+    ("e7", "Swamp"),
+    ("f1", "Desert"),
+    ("f2", "Desert"),
+    ("f6", "Swamp"),
+    ("f7", "Swamp"),
+    ("g1", "Temple"),
+    ("g2", "Desert"),
+    ("g4", "Exeter Village"),
+    ("g5", "Swamp"),
+    ("g6", "Swamp"),
+    ("g7", "Swamp")
   ]

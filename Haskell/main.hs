@@ -4,7 +4,7 @@ import Map
 import Data.List (find)
 import Control.Monad.State
 
-data GameState = GameState { currentLocation :: Location }
+newtype GameState = GameState { currentLocation :: Location }
 
 instructionsText :: [String]
 instructionsText = [
@@ -25,6 +25,14 @@ readCommand :: IO String
 readCommand = do
     putStr "> "
     getLine
+
+look :: StateT GameState IO ()
+look = do
+    currentState <- get
+    let loc = currentLocation currentState
+    case lookup loc descriptions of
+        Just description -> lift $ putStrLn $ "You are in " ++ description
+        Nothing -> lift $ putStrLn "Description not found for the current location."
 
 go :: Direction -> Location -> WorldMap -> Location
 go dir loc worldMap =
@@ -72,6 +80,7 @@ w = do
 
 gameLoop :: StateT GameState IO ()
 gameLoop = do
+    look
     cmd <- lift readCommand
     currentState <- get
     case cmd of
