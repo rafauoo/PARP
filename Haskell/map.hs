@@ -6,9 +6,11 @@ type Connection = (Location, Direction, Location)
 type Desc = (Location, String)
 type Description = [Desc]
 type WorldMap = [Connection]
+type Monster = (Location, String, Int)
+type Monsters = [Monster]
 
 worldMap :: WorldMap
-worldMap = 
+worldMap =
   [ ("a1", East, "a2"),
     ("a1", South, "b1"),
     ("a2", West, "a1"),
@@ -166,4 +168,23 @@ descriptions = [
     ("g5", "Swamp"),
     ("g6", "Swamp"),
     ("g7", "Swamp")
+  ]
+
+monsters :: Monsters
+monsters = [
+    ("a1", "MiniBoss - Druid", 2),
+    ("a7", "FINAL BOSS - Ephemeral Phantom", 5),
+    ("b2", "Elf", 1),
+    ("b3", "Wolf", 1),
+    ("b5", "MiniBoss - Goblin", 4),
+    ("b6", "Goblin", 1),
+    ("c2", "Elf", 1),
+    ("c6", "Goblin", 1),
+    ("e2", "Lion", 1),
+    ("e6", "Drowned", 1),
+    ("f2", "Hermit", 1),
+    ("g1", "MiniBoss - Undead Priest", 3),
+    ("g5", "Naiad", 1),
+    ("g7", "Drowned", 10),
+    ("a4", "River spirit", 0)
   ]

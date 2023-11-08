@@ -3,6 +3,7 @@ module Main where
 import Map
 import Data.List (find)
 import Control.Monad.State
+import Data.Maybe (isJust, fromJust)
 
 newtype GameState = GameState { currentLocation :: Location }
 
@@ -33,6 +34,13 @@ look = do
     case lookup loc descriptions of
         Just description -> lift $ putStrLn $ "You are in " ++ description
         Nothing -> lift $ putStrLn "Description not found for the current location."
+
+    let monsterInfo = checkMonster loc monsters
+    if isJust monsterInfo
+        then do
+            let (monsterName, monsterLevel) = fromJust monsterInfo
+            lift $ putStrLn $ "A wild " ++ monsterName ++ "[lvl " ++ show monsterLevel ++ "] appears!"
+        else lift $ return ()
 
 go :: Direction -> Location -> WorldMap -> Location
 go dir loc worldMap =
@@ -77,6 +85,12 @@ w = do
     let newLocation = go West (currentLocation currentState) worldMap
     put (currentState { currentLocation = newLocation })
     return newLocation
+
+checkMonster :: Location -> [Monster] -> Maybe (String, Int)
+checkMonster currentLocation monsters =
+    case filter (\(monsterLocation, _, _) -> currentLocation == monsterLocation) monsters of
+        [] -> Nothing
+        [(_, name, lvl)] -> Just (name, lvl)
 
 gameLoop :: StateT GameState IO ()
 gameLoop = do
