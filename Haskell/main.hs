@@ -10,7 +10,8 @@ import Data.Maybe (isJust, fromJust, fromMaybe)
 data GameState = GameState
   {currentLocation :: Location,
    playerWeaponLvl :: Int,
-   monstersActual :: Monsters}
+   monstersActual :: Monsters,
+   currentQuest :: String}
 
 instructionsText :: [String]
 instructionsText = [
@@ -199,8 +200,22 @@ gameLoop = do
             lift $ printLines ["Unknown command.", ""]
             gameLoop
 
+printNewQuest :: StateT GameState IO ()
+printNewQuest = do
+    currentState <- get
+    lift $ putStrLn $ "NEW QUEST ADDED: " ++ currentQuest currentState
+
 main :: IO ()
 main = do
-    let state = GameState {currentLocation="d4", playerWeaponLvl=1, monstersActual=monsters}
+    let state = GameState {currentLocation="d4", playerWeaponLvl=1, monstersActual=monsters,
+    currentQuest = "Collect 3 key fragments."}
+    putStrLn "In a realm veiled by ancient lore, three guardians protected fragments of a mysterious key."
+    putStrLn "Druid guarded the forest, the Undead Priest watched over the temple, and a formidable Goblin held the key fragment in treacherous caves."
+    putStrLn "Legends whispered of an elusive entity, the Ephemeral Phantom, residing in the abandoned house, said to hold the power to shape the realm's destiny."
+    putStrLn "Only a brave soul could confront this being and determine the realm's fate."
+
+    putStrLn ""
+    putStrLn $ "NEW QUEST ADDED: " ++ "Collect 3 key fragments."
+    putStrLn ""
     printInstructions
     evalStateT gameLoop state
