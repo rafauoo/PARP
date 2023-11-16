@@ -10,6 +10,8 @@ type Monster = (Location, String, Int)
 type Monsters = [Monster]
 type LvlUp = (Location, Int)
 type LvlUps = [LvlUp]
+type Key = (Location, String)
+type Keys = [Key]
 
 worldMap :: WorldMap
 worldMap =
@@ -198,3 +200,10 @@ lvlups = [
   ("a4", 1),
   ("g4", 1)
   ]
+
+keys :: Keys
+keys = [
+  ("a1", "Heartwood Key"),
+  ("g1", "Divine Sigil Key"),
+  ("b5", "Stoneheart Key")
+]
