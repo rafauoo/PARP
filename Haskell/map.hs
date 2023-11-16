@@ -8,6 +8,8 @@ type Description = [Desc]
 type WorldMap = [Connection]
 type Monster = (Location, String, Int)
 type Monsters = [Monster]
+type LvlUp = (Location, Int)
+type LvlUps = [LvlUp]
 
 worldMap :: WorldMap
 worldMap =
@@ -187,4 +189,12 @@ monsters = [
     ("g5", "Naiad", 1),
     ("g7", "Drowned", 10),
     ("a4", "River spirit", 0)
+  ]
+
+lvlups :: LvlUps
+lvlups = [
+  ("c2", 1),
+  ("f2", 1),
+  ("a4", 1),
+  ("g4", 1)
   ]

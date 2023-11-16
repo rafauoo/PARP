@@ -3,12 +3,14 @@ module Main where
 import Map
 import Data.List (find)
 import Control.Monad.State
+import Control.Monad
 import Control.Monad.Trans
 import Data.Maybe (isJust, fromJust, fromMaybe)
 
 data GameState = GameState
   {currentLocation :: Location,
-   playerWeaponLvl :: Int}
+   playerWeaponLvl :: Int,
+   monstersActual :: Monsters}
 
 instructionsText :: [String]
 instructionsText = [
@@ -16,6 +18,11 @@ instructionsText = [
     "",
     "instructions  -- to see these instructions.",
     "quit          -- to end the game and quit.",
+    "w             -- go west.",
+    "e             -- go east.",
+    "n             -- go north.",
+    "s             -- go south.",
+
     ""
     ]
 
@@ -30,6 +37,15 @@ readCommand = do
     putStr "> "
     getLine
 
+death :: StateT GameState IO ()
+death = do
+    currentState <- get
+    put currentState { currentLocation ="d4"}
+    lift $ putStrLn $ ""
+    lift $ putStrLn $ "Local medic has found your body..."
+    lift $ putStrLn $ ""
+    lift $ putStrLn $ ""
+    look
 look :: StateT GameState IO ()
 look = do
     currentState <- get
@@ -40,7 +56,7 @@ look = do
         Just description -> lift $ putStrLn $ "You are in " ++ description
         Nothing -> lift $ putStrLn "Description not found for the current location."
 
-    let monsterInfo = checkMonster loc monsters
+    let monsterInfo = checkMonster loc (monstersActual currentState)
     if isJust monsterInfo
         then do
             let (monsterName, monsterLevel) = fromMaybe ("Empty", 0) monsterInfo
@@ -48,9 +64,13 @@ look = do
             monsterDefeated <- combat (monsterName, monsterLevel) weaponLvl
             if monsterDefeated
                 then do
-                  updateWeaponLvl (playerWeaponLvl currentState + 1)
-                  return ()
-                else return ()
+                    let addLvl = checkLvlUp loc lvlups
+                    updateWeaponLvl (playerWeaponLvl currentState + addLvl)
+                    removeMonster loc
+                    return ()
+            else do
+                death
+                return ()
         else lift $ return ()
 
 go :: Direction -> Location -> WorldMap -> Location
@@ -106,7 +126,7 @@ checkMonster currentLocation monsters =
 combat :: (String, Int) -> Int -> StateT GameState IO Bool
 combat (name, monsterLvl) playerWeaponLvl = do
     lift $ putStrLn $ "You are battling " ++ name
-    if (playerWeaponLvl >= monsterLvl)
+    if playerWeaponLvl >= monsterLvl
         then do
           lift $ putStrLn $ "You have defeated " ++ name
           return True
@@ -114,15 +134,28 @@ combat (name, monsterLvl) playerWeaponLvl = do
           lift $ putStrLn $ "You were defeated by " ++ name
           return False
 
+removeMonster :: String -> StateT GameState IO ()
+removeMonster monsterLoc = do
+    currentState <- get
+    let currentMonsters = monstersActual currentState
+        newMonsters = filter (\(loc, _, _) -> loc /= monsterLoc) currentMonsters
+    put currentState { monstersActual = newMonsters }
+
 updateWeaponLvl :: Int -> StateT GameState IO ()
 updateWeaponLvl newLvl = do
   currentState <- get
-  put $ currentState { playerWeaponLvl = newLvl }
+  put currentState { playerWeaponLvl = newLvl }
 
 updateLocation :: Location -> StateT GameState IO ()
 updateLocation newLocation = do
   currentState <- get
-  put $ currentState { currentLocation = newLocation }
+  put currentState { currentLocation = newLocation }
+
+checkLvlUp :: Location -> LvlUps -> Int
+checkLvlUp currentLocation lvlups =
+    case filter (\(lvlUpLoc, _) -> currentLocation == lvlUpLoc) lvlups of
+        [] -> 0
+        [(_, addLvl)] -> addLvl
 
 gameLoop :: StateT GameState IO ()
 gameLoop = do
@@ -168,6 +201,6 @@ gameLoop = do
 
 main :: IO ()
 main = do
-    let state = GameState {currentLocation="d4", playerWeaponLvl=1}
+    let state = GameState {currentLocation="d4", playerWeaponLvl=1, monstersActual=monsters}
     printInstructions
     evalStateT gameLoop state
