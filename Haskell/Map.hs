@@ -206,4 +206,4 @@ keys = [
   ("a1", "Heartwood Key"),
   ("g1", "Divine Sigil Key"),
   ("b5", "Stoneheart Key")
-]
+  ]
