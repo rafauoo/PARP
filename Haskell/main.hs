@@ -11,7 +11,8 @@ data GameState = GameState
   {currentLocation :: Location,
    playerWeaponLvl :: Int,
    monstersActual :: Monsters,
-   currentQuest :: String}
+   currentQuest :: String,
+   equipment :: [Key]}
 
 instructionsText :: [String]
 instructionsText = [
@@ -68,6 +69,7 @@ look = do
                     let addLvl = checkLvlUp loc lvlups
                     updateWeaponLvl (playerWeaponLvl currentState + addLvl)
                     removeMonster loc
+                    addKeyIfInLocation keys
                     return ()
             else do
                 death
@@ -144,19 +146,32 @@ removeMonster monsterLoc = do
 
 updateWeaponLvl :: Int -> StateT GameState IO ()
 updateWeaponLvl newLvl = do
-  currentState <- get
-  put currentState { playerWeaponLvl = newLvl }
+    currentState <- get
+    put currentState { playerWeaponLvl = newLvl }
 
 updateLocation :: Location -> StateT GameState IO ()
 updateLocation newLocation = do
-  currentState <- get
-  put currentState { currentLocation = newLocation }
+    currentState <- get
+    put currentState { currentLocation = newLocation }
 
 checkLvlUp :: Location -> LvlUps -> Int
 checkLvlUp currentLocation lvlups =
     case filter (\(lvlUpLoc, _) -> currentLocation == lvlUpLoc) lvlups of
         [] -> 0
         [(_, addLvl)] -> addLvl
+
+
+addKeyIfInLocation :: Keys -> StateT GameState IO ()
+addKeyIfInLocation keys = do
+    currentState <- get
+    let currentLoc = currentLocation currentState
+        keyincurrLoc = filter (\(loc, _) -> loc == currentLoc) keys
+    put currentState {equipment = equipment currentState ++ keyincurrLoc}
+
+
+formatKey :: Key -> String
+formatKey (_, keyName) = "- " ++ keyName
+
 
 gameLoop :: StateT GameState IO ()
 gameLoop = do
@@ -195,6 +210,12 @@ gameLoop = do
                 else
                     lift $ putStrLn $ "You are now at location " ++ newLoc
             gameLoop
+        "bag" -> do
+            lift $ putStrLn ""
+            lift $ putStrLn "My equipment:"
+            lift $ mapM_ (putStrLn . formatKey) (equipment currentState)
+            lift $ putStrLn ""
+            gameLoop
         "quit" -> return ()
         _ -> do
             lift $ printLines ["Unknown command.", ""]
@@ -208,7 +229,7 @@ printNewQuest = do
 main :: IO ()
 main = do
     let state = GameState {currentLocation="d4", playerWeaponLvl=1, monstersActual=monsters,
-    currentQuest = "Collect 3 key fragments."}
+    currentQuest = "Collect 3 key fragments.", equipment = []}
     putStrLn "In a realm veiled by ancient lore, three guardians protected fragments of a mysterious key."
     putStrLn "Druid guarded the forest, the Undead Priest watched over the temple, and a formidable Goblin held the key fragment in treacherous caves."
     putStrLn "Legends whispered of an elusive entity, the Ephemeral Phantom, residing in the abandoned house, said to hold the power to shape the realm's destiny."
