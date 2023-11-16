@@ -24,6 +24,7 @@ instructionsText = [
     "e             -- go east.",
     "n             -- go north.",
     "s             -- go south.",
+    "bag           -- see your equipment",
     "quest         -- print current quest.",
     ""
     ]
