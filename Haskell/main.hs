@@ -24,7 +24,7 @@ instructionsText = [
     "e             -- go east.",
     "n             -- go north.",
     "s             -- go south.",
-
+    "quest         -- print current quest.",
     ""
     ]
 
@@ -216,15 +216,34 @@ gameLoop = do
             lift $ mapM_ (putStrLn . formatKey) (equipment currentState)
             lift $ putStrLn ""
             gameLoop
+        "quest" -> do
+            printCurrentQuest
+            gameLoop
         "quit" -> return ()
         _ -> do
             lift $ printLines ["Unknown command.", ""]
             gameLoop
 
+changeQuest :: String -> StateT GameState IO ()
+changeQuest newQuest = do
+    currentState <- get
+    lift $ putStrLn $ ""
+    lift $ putStrLn $ "QUEST FINISHED: " ++ currentQuest currentState
+    lift $ putStrLn $ ""
+    put currentState { currentQuest = newQuest}
+    printNewQuest
+
 printNewQuest :: StateT GameState IO ()
 printNewQuest = do
     currentState <- get
+    lift $ putStrLn $ ""
     lift $ putStrLn $ "NEW QUEST ADDED: " ++ currentQuest currentState
+    lift $ putStrLn $ ""
+
+printCurrentQuest :: StateT GameState IO ()
+printCurrentQuest = do
+    currentState <- get
+    lift $ putStrLn $ "CURRENT QUEST: " ++ currentQuest currentState
 
 main :: IO ()
 main = do
