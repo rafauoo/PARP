@@ -28,7 +28,7 @@ worldMap =
     ("a5", South, "b5"),
     ("a6", West, "a5"),
     ("a6", South, "b6"),
-    ("a7", West, "b6"),
+    ("a7", West, "a6"),
     ("b1", South, "c1"),
     ("b1", North, "a1"),
     ("b1", East, "b2"),
