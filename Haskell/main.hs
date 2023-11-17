@@ -12,7 +12,8 @@ data GameState = GameState
    playerWeaponLvl :: Int,
    monstersActual :: Monsters,
    currentQuest :: String,
-   equipment :: [Key]}
+   equipment :: [Key],
+   worldMapActual :: WorldMap}
 
 instructionsText :: [String]
 instructionsText = [
@@ -71,11 +72,10 @@ look = do
                     updateWeaponLvl (playerWeaponLvl currentState + addLvl)
                     removeMonster loc
                     addKeyIfInLocation keys
-                    -- havekeys <- haveAllKeys keys
-                    -- when havekeys $ do
-                    --     let newConnection = ("a6", East, "a7")
-                    --     modify (\s -> s { worldMap = addConnection newConnection (worldMap s) })
-                    -- return ()
+                    havekeys <- haveAllKeys keys
+                    when havekeys $ do
+                        let newConnection = ("a6", East, "a7")
+                        addConnection newConnection
             else do
                 death
                 return ()
@@ -181,8 +181,9 @@ addKeyIfInLocation keys = do
     put currentState {equipment = equipment currentState ++ keyincurrLoc}
 
 
-addConnection :: Connection -> WorldMap -> WorldMap
-addConnection connection worldMap = connection : worldMap
+addConnection :: Connection -> StateT GameState IO ()
+addConnection connection = do
+    modify (\currentState -> currentState { worldMapActual = connection : worldMapActual currentState })
 
 
 formatKey :: Key -> String
@@ -263,7 +264,7 @@ printCurrentQuest = do
 main :: IO ()
 main = do
     let state = GameState {currentLocation="d4", playerWeaponLvl=1, monstersActual=monsters,
-    currentQuest = "Collect 3 key fragments.", equipment = []}
+    currentQuest = "Collect 3 key fragments.", equipment = [], worldMapActual=worldMap}
     putStrLn "In a realm veiled by ancient lore, three guardians protected fragments of a mysterious key."
     putStrLn "Druid guarded the forest, the Undead Priest watched over the temple, and a formidable Goblin held the key fragment in treacherous caves."
     putStrLn "Legends whispered of an elusive entity, the Ephemeral Phantom, residing in the abandoned house, said to hold the power to shape the realm's destiny."
