@@ -71,7 +71,11 @@ look = do
                     updateWeaponLvl (playerWeaponLvl currentState + addLvl)
                     removeMonster loc
                     addKeyIfInLocation keys
-                    return ()
+                    -- havekeys <- haveAllKeys keys
+                    -- when havekeys $ do
+                    --     let newConnection = ("a6", East, "a7")
+                    --     modify (\s -> s { worldMap = addConnection newConnection (worldMap s) })
+                    -- return ()
             else do
                 death
                 return ()
@@ -132,11 +136,11 @@ combat (name, monsterLvl) playerWeaponLvl = do
     lift $ putStrLn $ "You are battling " ++ name
     if playerWeaponLvl >= monsterLvl
         then do
-          lift $ putStrLn $ "You have defeated " ++ name
-          return True
+            lift $ putStrLn $ "You have defeated " ++ name
+            return True
         else do
-          lift $ putStrLn $ "You were defeated by " ++ name
-          return False
+            lift $ putStrLn $ "You were defeated by " ++ name
+            return False
 
 removeMonster :: String -> StateT GameState IO ()
 removeMonster monsterLoc = do
@@ -162,12 +166,23 @@ checkLvlUp currentLocation lvlups =
         [(_, addLvl)] -> addLvl
 
 
+haveAllKeys :: Keys -> StateT GameState IO Bool
+haveAllKeys keys = do
+    currentState <- get
+    let keysInEquipment = filter (\(_, keyName) -> keyName == "Key") (equipment currentState)
+    return $ length keysInEquipment == length keys
+
+
 addKeyIfInLocation :: Keys -> StateT GameState IO ()
 addKeyIfInLocation keys = do
     currentState <- get
     let currentLoc = currentLocation currentState
         keyincurrLoc = filter (\(loc, _) -> loc == currentLoc) keys
     put currentState {equipment = equipment currentState ++ keyincurrLoc}
+
+
+addConnection :: Connection -> WorldMap -> WorldMap
+addConnection connection worldMap = connection : worldMap
 
 
 formatKey :: Key -> String
@@ -212,8 +227,7 @@ gameLoop = do
                     lift $ putStrLn $ "You are now at location " ++ newLoc
             gameLoop
         "bag" -> do
-            lift $ putStrLn ""
-            lift $ putStrLn "My equipment:"
+            lift $ putStrLn "\nMy equipment:"
             lift $ mapM_ (putStrLn . formatKey) (equipment currentState)
             lift $ putStrLn ""
             gameLoop
