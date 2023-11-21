@@ -12,6 +12,8 @@ type LvlUp = (Location, Int)
 type LvlUps = [LvlUp]
 type Key = (Location, String)
 type Keys = [Key]
+type Character = (Location, String)
+type Characters = [Character]
 
 worldMap :: WorldMap
 worldMap =
@@ -206,4 +208,9 @@ keys = [
   ("a1", "Heartwood Key"),
   ("g1", "Divine Sigil Key"),
   ("b5", "Stoneheart Key")
+  ]
+
+characters :: Characters
+characters = [
+  ("d4", "Jake")
   ]

@@ -5,7 +5,7 @@ import Data.List (find)
 import Control.Monad.State
 import Control.Monad
 import Control.Monad.Trans
-import Data.Maybe (isJust, fromJust, fromMaybe)
+import Data.Maybe (isJust, fromJust, fromMaybe, maybe)
 
 data GameState = GameState
   {currentLocation :: Location,
@@ -59,7 +59,7 @@ look = do
     case lookup loc descriptions of
         Just description -> lift $ putStrLn $ "You are in " ++ description
         Nothing -> lift $ putStrLn "Description not found for the current location."
-
+    liftIO $ listCharactersAt loc characters
     let monsterInfo = checkMonster loc (monstersActual currentState)
     if isJust monsterInfo
         then do
@@ -76,52 +76,53 @@ look = do
                     when havekeys $ do
                         let newConnection = ("a6", East, "a7")
                         addConnection newConnection
+                        changeQuest "Talk to Jake in Anyor."
             else do
                 death
                 return ()
         else lift $ return ()
 
 go :: Direction -> Location -> WorldMap -> Location
-go dir loc worldMap =
+go dir loc worldMapActual =
     case dir of
-        North -> case find (\(l, d, l') -> l == loc && d == North) worldMap of
+        North -> case find (\(l, d, l') -> l == loc && d == North) worldMapActual of
                     Just (_, _, newLoc) -> newLoc
                     Nothing -> loc
-        South -> case find (\(l, d, l') -> l == loc && d == South) worldMap of
+        South -> case find (\(l, d, l') -> l == loc && d == South) worldMapActual of
                     Just (_, _, newLoc) -> newLoc
                     Nothing -> loc
-        East -> case find (\(l, d, l') -> l == loc && d == East) worldMap of
+        East -> case find (\(l, d, l') -> l == loc && d == East) worldMapActual of
                     Just (_, _, newLoc) -> newLoc
                     Nothing -> loc
-        West -> case find (\(l, d, l') -> l == loc && d == West) worldMap of
+        West -> case find (\(l, d, l') -> l == loc && d == West) worldMapActual of
                     Just (_, _, newLoc) -> newLoc
                     Nothing -> loc
 
 n :: StateT GameState IO String
 n = do
     currentState <- get
-    let newLocation = go North (currentLocation currentState) worldMap
+    let newLocation = go North (currentLocation currentState) worldMapActual
     put (currentState { currentLocation = newLocation })
     return newLocation
 
 s :: StateT GameState IO String
 s = do
     currentState <- get
-    let newLocation = go South (currentLocation currentState) worldMap
+    let newLocation = go South (currentLocation currentState) worldMapActual
     put (currentState { currentLocation = newLocation })
     return newLocation
 
 e :: StateT GameState IO String
 e = do
     currentState <- get
-    let newLocation = go East (currentLocation currentState) worldMap
+    let newLocation = go East (currentLocation currentState) worldMapActual
     put (currentState { currentLocation = newLocation })
     return newLocation
 
 w :: StateT GameState IO String
 w = do
     currentState <- get
-    let newLocation = go West (currentLocation currentState) worldMap
+    let newLocation = go West (currentLocation currentState) worldMapActual
     put (currentState { currentLocation = newLocation })
     return newLocation
 
@@ -169,8 +170,7 @@ checkLvlUp currentLocation lvlups =
 haveAllKeys :: Keys -> StateT GameState IO Bool
 haveAllKeys keys = do
     currentState <- get
-    let keysInEquipment = filter (\(_, keyName) -> keyName == "Key") (equipment currentState)
-    return $ length keysInEquipment == length keys
+    return $ length (equipment currentState) == length keys
 
 
 addKeyIfInLocation :: Keys -> StateT GameState IO ()
@@ -189,13 +189,23 @@ addConnection connection = do
 formatKey :: Key -> String
 formatKey (_, keyName) = "- " ++ keyName
 
+getFirstWord :: String -> String
+getFirstWord str = case words str of
+    (firstWord:_) -> firstWord
+    _ -> ""
+
+getSecondWord :: String -> String
+getSecondWord str =
+    case words str of
+        (_:second:_) -> second
+        _ -> ""
 
 gameLoop :: StateT GameState IO ()
 gameLoop = do
     look
     cmd <- lift readCommand
     currentState <- get
-    case cmd of
+    case getFirstWord cmd of
         "instructions" -> do
             lift printInstructions
             gameLoop
@@ -235,6 +245,9 @@ gameLoop = do
         "quest" -> do
             printCurrentQuest
             gameLoop
+        "talk" -> do
+            talk (getSecondWord cmd)
+            gameLoop
         "quit" -> return ()
         _ -> do
             lift $ printLines ["Unknown command.", ""]
@@ -260,6 +273,29 @@ printCurrentQuest :: StateT GameState IO ()
 printCurrentQuest = do
     currentState <- get
     lift $ putStrLn $ "CURRENT QUEST: " ++ currentQuest currentState
+
+listCharactersAt :: Location -> Characters -> IO ()
+listCharactersAt _ [] = return ()
+listCharactersAt loc ((l, name):xs) =
+    if loc == l
+        then do
+            putStrLn $ "Characters present: " ++ name
+            return ()
+        else listCharactersAt loc xs
+
+talk :: String -> StateT GameState IO ()
+talk name = do
+    havekeys <- haveAllKeys keys
+    if name == "Jake" && havekeys
+        then do
+            lift $ putStrLn $ "So it is true. You need to prepare. Find Exeter to get a better weapon."
+            changeQuest "Find Exeter to get a better weapon."
+            let newConnection = ("g5", West, "g4")
+            addConnection newConnection
+            return ()
+        else do
+            lift $ putStrLn $ "Cannot talk to him!"
+            return ()
 
 main :: IO ()
 main = do
