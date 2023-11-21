@@ -82,47 +82,51 @@ look = do
                 return ()
         else lift $ return ()
 
-go :: Direction -> Location -> WorldMap -> Location
-go dir loc worldMapActual =
+go :: Direction -> Location -> [Connection] -> Location
+go dir loc map =
     case dir of
-        North -> case find (\(l, d, l') -> l == loc && d == North) worldMapActual of
+        North -> case find (\(l, d, l') -> l == loc && d == North) map of
                     Just (_, _, newLoc) -> newLoc
                     Nothing -> loc
-        South -> case find (\(l, d, l') -> l == loc && d == South) worldMapActual of
+        South -> case find (\(l, d, l') -> l == loc && d == South) map of
                     Just (_, _, newLoc) -> newLoc
                     Nothing -> loc
-        East -> case find (\(l, d, l') -> l == loc && d == East) worldMapActual of
+        East -> case find (\(l, d, l') -> l == loc && d == East) map of
                     Just (_, _, newLoc) -> newLoc
                     Nothing -> loc
-        West -> case find (\(l, d, l') -> l == loc && d == West) worldMapActual of
+        West -> case find (\(l, d, l') -> l == loc && d == West) map of
                     Just (_, _, newLoc) -> newLoc
                     Nothing -> loc
 
 n :: StateT GameState IO String
 n = do
     currentState <- get
-    let newLocation = go North (currentLocation currentState) worldMapActual
+    let worldMapActualValue = worldMapActual currentState
+    let newLocation = go North (currentLocation currentState) worldMapActualValue
     put (currentState { currentLocation = newLocation })
     return newLocation
 
 s :: StateT GameState IO String
 s = do
     currentState <- get
-    let newLocation = go South (currentLocation currentState) worldMapActual
+    let worldMapActualValue = worldMapActual currentState
+    let newLocation = go South (currentLocation currentState) worldMapActualValue
     put (currentState { currentLocation = newLocation })
     return newLocation
 
 e :: StateT GameState IO String
 e = do
     currentState <- get
-    let newLocation = go East (currentLocation currentState) worldMapActual
+    let worldMapActualValue = worldMapActual currentState
+    let newLocation = go East (currentLocation currentState) worldMapActualValue
     put (currentState { currentLocation = newLocation })
     return newLocation
 
 w :: StateT GameState IO String
 w = do
     currentState <- get
-    let newLocation = go West (currentLocation currentState) worldMapActual
+    let worldMapActualValue = worldMapActual currentState
+    let newLocation = go West (currentLocation currentState) worldMapActualValue
     put (currentState { currentLocation = newLocation })
     return newLocation
 
