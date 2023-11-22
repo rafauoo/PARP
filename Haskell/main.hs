@@ -59,6 +59,7 @@ look = do
     case lookup loc descriptions of
         Just description -> lift $ putStrLn $ "You are in " ++ description
         Nothing -> lift $ putStrLn "Description not found for the current location."
+    checkIfInExeter
     liftIO $ listCharactersAt loc characters
     let monsterInfo = checkMonster loc (monstersActual currentState)
     if isJust monsterInfo
@@ -73,7 +74,7 @@ look = do
                     removeMonster loc
                     addKeyIfInLocation keys
                     havekeys <- haveAllKeys keys
-                    when havekeys $ do
+                    when (havekeys && (currentQuest currentState) == "Collect 3 key fragments.") $ do
                         let newConnection = ("a6", East, "a7")
                         addConnection newConnection
                         changeQuest "Talk to Jake in Anyor."
@@ -300,6 +301,16 @@ talk name = do
         else do
             lift $ putStrLn $ "Cannot talk to him!"
             return ()
+
+checkIfInExeter :: StateT GameState IO ()
+checkIfInExeter = do
+    currentState <- get
+    let loc = currentLocation currentState
+    if loc == "g4" && currentQuest currentState == "Find Exeter to get a better weapon." then do
+        changeQuest "Kill Empheral Phantom."
+        let addLvl = checkLvlUp loc lvlups
+        updateWeaponLvl (playerWeaponLvl currentState + addLvl)
+    else return ()
 
 main :: IO ()
 main = do

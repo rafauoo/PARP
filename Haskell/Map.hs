@@ -211,6 +211,6 @@ keys = [
   ]
 
 characters :: Characters
-characters = [
+ = [
   ("d4", "Jake")
   ]
