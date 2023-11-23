@@ -71,8 +71,8 @@ look = do
             if monsterDefeated
                 then do
                     let addLvl = checkLvlUp loc lvlups
-                    updateWeaponLvl (playerWeaponLvl currentState + addLvl)
-                    removeMonster loc
+                    modify (\s -> execState (updateWeaponLvl (playerWeaponLvl currentState + addLvl)) s)
+                    modify (\s -> execState (removeMonster loc) s)
                     modify (\s -> execState (addKeyIfInLocation keys) s)
                     currentState <- get
                     let havekeys = haveAllKeys keys (equipment currentState)
@@ -151,22 +151,17 @@ combat (name, monsterLvl) playerWeaponLvl = do
             lift $ putStrLn $ "You were defeated by " ++ name
             return False
 
-removeMonster :: String -> StateT GameState IO ()
+removeMonster :: String -> State GameState ()
 removeMonster monsterLoc = do
     currentState <- get
     let currentMonsters = monstersActual currentState
         newMonsters = filter (\(loc, _, _) -> loc /= monsterLoc) currentMonsters
     put currentState { monstersActual = newMonsters }
 
-updateWeaponLvl :: Int -> StateT GameState IO ()
+updateWeaponLvl :: Int -> State GameState ()
 updateWeaponLvl newLvl = do
     currentState <- get
     put currentState { playerWeaponLvl = newLvl }
-
-updateLocation :: Location -> StateT GameState IO ()
-updateLocation newLocation = do
-    currentState <- get
-    put currentState { currentLocation = newLocation }
 
 checkLvlUp :: Location -> LvlUps -> Int
 checkLvlUp currentLocation lvlups =
@@ -319,7 +314,7 @@ checkIfInExeter = do
     if loc == "g4" && currentQuest currentState == "Find Exeter to get a better weapon." then do
         changeQuest "Kill Empheral Phantom."
         let addLvl = checkLvlUp loc lvlups
-        updateWeaponLvl (playerWeaponLvl currentState + addLvl)
+        modify (\s -> execState (updateWeaponLvl (playerWeaponLvl currentState + addLvl)) s)
     else return ()
 
 main :: IO ()
