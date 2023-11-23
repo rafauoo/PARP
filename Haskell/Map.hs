@@ -8,6 +8,7 @@ type Description = [Desc]
 type WorldMap = [Connection]
 type Monster = (Location, String, Int)
 type Monsters = [Monster]
+type RandomMonsters = [Monster]
 type LvlUp = (Location, Int)
 type LvlUps = [LvlUp]
 type Key = (Location, String)
@@ -180,37 +181,53 @@ monsters :: Monsters
 monsters = [
     ("a1", "MiniBoss - Druid", 2),
     ("a7", "FINAL BOSS - Ephemeral Phantom", 5),
-    ("b2", "Elf", 1),
-    ("b3", "Wolf", 1),
     ("b5", "MiniBoss - Goblin", 4),
-    ("b6", "Goblin", 1),
     ("c2", "Elf", 1),
-    ("c6", "Goblin", 1),
-    ("e2", "Lion", 1),
-    ("e6", "Drowned", 1),
     ("f2", "Hermit", 1),
     ("g1", "MiniBoss - Undead Priest", 3),
-    ("g5", "Naiad", 1),
-    ("g7", "Drowned", 10),
     ("a4", "River spirit", 0)
-  ]
+	]
+
+randomMonsters :: RandomMonsters
+randomMonsters = [
+	("a2", "Wolf", 1),
+	("a3", "Elf", 1),
+	("b2", "Elf", 1),
+  	("b3", "Wolf", 1),
+	("b6", "Goblin", 1),
+	("c1", "Wolf", 1),
+	("c3", "Elf", 1),
+	("c6", "Goblin", 1),
+	("d1", "Ocelot", 1),
+	("d3", "Wolf", 1),
+	("d6", "Ocelot", 1),
+	("d7", "Ocelot", 1),
+  	("e2", "Lion", 1),
+	("e4", "Goblin", 1),
+  	("e6", "Drowned", 1),
+	("f1", "Hermit", 1),
+	("f6", "Drowned", 1),
+	("f7", "Drowned", 1),
+	("g5", "Naiad", 1),
+  	("g7", "Drowned", 1)
+	]
 
 lvlups :: LvlUps
 lvlups = [
-  ("c2", 1),
-  ("f2", 1),
-  ("a4", 1),
-  ("g4", 1)
-  ]
+  	("c2", 1),
+  	("f2", 1),
+  	("a4", 1),
+  	("g4", 1)
+	]
 
 keys :: Keys
 keys = [
-  ("a1", "Heartwood Key"),
-  ("g1", "Divine Sigil Key"),
-  ("b5", "Stoneheart Key")
-  ]
+	("a1", "Heartwood Key"),
+  	("g1", "Divine Sigil Key"),
+  	("b5", "Stoneheart Key")
+	]
 
 characters :: Characters
- = [
-  ("d4", "Jake")
-  ]
+characters = [
+ 	("d4", "Jake")
+	]

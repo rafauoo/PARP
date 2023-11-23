@@ -6,12 +6,14 @@ import Control.Monad.State
 import Control.Monad
 import Control.Monad.Trans
 import Control.Monad.Identity
-import Data.Maybe (isJust, fromJust, fromMaybe, maybe)
+import System.Random
+import Data.Maybe (isJust, fromJust, fromMaybe, maybe, isNothing)
 
 data GameState = GameState
   {currentLocation :: Location,
    playerWeaponLvl :: Int,
    monstersActual :: Monsters,
+   monstersRandom :: RandomMonsters,
    currentQuest :: String,
    equipment :: [Key],
    worldMapActual :: WorldMap}
@@ -66,7 +68,7 @@ look = do
     if isJust monsterInfo
         then do
             let (monsterName, monsterLevel) = fromMaybe ("Empty", 0) monsterInfo
-            lift $ putStrLn $ "A wild " ++ monsterName ++ "[lvl " ++ show monsterLevel ++ "] appears!"
+            lift $ putStrLn $ "A wild " ++ monsterName ++ " [lvl " ++ show monsterLevel ++ "] appears!"
             monsterDefeated <- combat (monsterName, monsterLevel) weaponLvl
             if monsterDefeated
                 then do
@@ -84,7 +86,24 @@ look = do
             else do
                 death
                 return ()
-        else lift $ return ()
+    else do
+        shouldSpawnMonster <- liftIO $ randomRIO (1, 10 :: Int)
+        when (shouldSpawnMonster <= 3) $ do
+            let monsterInfo = checkMonster loc (monstersRandom currentState)
+            if isJust monsterInfo
+                then do
+                    let (monsterName, _) = fromMaybe ("Empty", 0) monsterInfo
+                    let levels = [1, 1, 1, 1, 1, 2, 2, 3, 4, 5]
+                    idx <- liftIO $ randomRIO (0, 9 :: Int)
+                    let monsterLevel = levels !! idx
+                    lift $ putStrLn $ "A wild " ++ monsterName ++ " [lvl " ++ show monsterLevel ++ "] appears!"
+                    monsterDefeated <- combat (monsterName, monsterLevel) weaponLvl
+                    when (not monsterDefeated) $ do
+                        death
+                        return ()
+                    return()
+            else do
+                lift $ return ()
 
 go :: Direction -> Location -> [Connection] -> Location
 go dir loc map =
@@ -320,7 +339,7 @@ checkIfInExeter = do
 main :: IO ()
 main = do
     let state = GameState {currentLocation="d4", playerWeaponLvl=1, monstersActual=monsters,
-    currentQuest = "Collect 3 key fragments.", equipment = [], worldMapActual=worldMap}
+    monstersRandom=randomMonsters, currentQuest = "Collect 3 key fragments.", equipment = [], worldMapActual=worldMap}
     putStrLn "In a realm veiled by ancient lore, three guardians protected fragments of a mysterious key."
     putStrLn "Druid guarded the forest, the Undead Priest watched over the temple, and a formidable Goblin held the key fragment in treacherous caves."
     putStrLn "Legends whispered of an elusive entity, the Ephemeral Phantom, residing in the abandoned house, said to hold the power to shape the realm's destiny."
