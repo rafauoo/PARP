@@ -74,7 +74,9 @@ look = do
                     updateWeaponLvl (playerWeaponLvl currentState + addLvl)
                     removeMonster loc
                     modify (\s -> execState (addKeyIfInLocation keys) s)
+                    currentState <- get
                     let havekeys = haveAllKeys keys (equipment currentState)
+                    -- liftIO $ putStrLn $ "Length of keys: " ++ show (length (equipment currentState))
                     when (havekeys && (currentQuest currentState) == "Collect 3 key fragments.") $ do
                         let newConnection = ("a6", East, "a7")
                         modify (\s -> execState (addConnection newConnection) s)
