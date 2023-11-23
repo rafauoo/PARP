@@ -102,7 +102,7 @@ go dir loc map =
                     Just (_, _, newLoc) -> newLoc
                     Nothing -> loc
 
-n :: StateT GameState IO String
+n :: State GameState String
 n = do
     currentState <- get
     let worldMapActualValue = worldMapActual currentState
@@ -110,7 +110,7 @@ n = do
     put (currentState { currentLocation = newLocation })
     return newLocation
 
-s :: StateT GameState IO String
+s :: State GameState String
 s = do
     currentState <- get
     let worldMapActualValue = worldMapActual currentState
@@ -118,7 +118,7 @@ s = do
     put (currentState { currentLocation = newLocation })
     return newLocation
 
-e :: StateT GameState IO String
+e :: State GameState String
 e = do
     currentState <- get
     let worldMapActualValue = worldMapActual currentState
@@ -126,7 +126,7 @@ e = do
     put (currentState { currentLocation = newLocation })
     return newLocation
 
-w :: StateT GameState IO String
+w :: State GameState String
 w = do
     currentState <- get
     let worldMapActualValue = worldMapActual currentState
@@ -218,28 +218,36 @@ gameLoop = do
             lift printInstructions
             gameLoop
         "n" -> do
-            newLoc <- n
+            -- newLoc <- n
+            let newLoc = evalState n currentState
+            modify (\s -> execState n s)
             if currentLocation currentState == newLoc then
                 lift $ putStrLn "You can't go that way!"
                 else
                     lift $ putStrLn $ "You are now at location " ++ newLoc
             gameLoop
         "w" -> do
-            newLoc <- w
+            -- newLoc <- w
+            let newLoc = evalState w currentState
+            modify (\s -> execState w s)
             if currentLocation currentState == newLoc then
                 lift $ putStrLn "You can't go that way!"
                 else
                     lift $ putStrLn $ "You are now at location " ++ newLoc
             gameLoop
         "s" -> do
-            newLoc <- s
+            -- newLoc <- s
+            let newLoc = evalState s currentState
+            modify (\x -> execState s x)
             if currentLocation currentState == newLoc then
                 lift $ putStrLn "You can't go that way!"
                 else
                     lift $ putStrLn $ "You are now at location " ++ newLoc
             gameLoop
         "e" -> do
-            newLoc <- e
+            -- newLoc <- e
+            let newLoc = evalState e currentState
+            modify (\s -> execState e s)
             if currentLocation currentState == newLoc then
                 lift $ putStrLn "You can't go that way!"
                 else
