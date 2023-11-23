@@ -74,7 +74,7 @@ look = do
                     updateWeaponLvl (playerWeaponLvl currentState + addLvl)
                     removeMonster loc
                     modify (\s -> execState (addKeyIfInLocation keys) s)
-                    havekeys <- haveAllKeys keys
+                    let havekeys = haveAllKeys keys (equipment currentState)
                     when (havekeys && (currentQuest currentState) == "Collect 3 key fragments.") $ do
                         let newConnection = ("a6", East, "a7")
                         modify (\s -> execState (addConnection newConnection) s)
@@ -173,10 +173,8 @@ checkLvlUp currentLocation lvlups =
         [(_, addLvl)] -> addLvl
 
 
-haveAllKeys :: Keys -> StateT GameState IO Bool
-haveAllKeys keys = do
-    currentState <- get
-    return $ length (equipment currentState) == length keys
+haveAllKeys :: Keys -> Keys -> Bool
+haveAllKeys keys1 keys2 = length keys1 == length keys2
 
 
 addKeyIfInLocation :: Keys -> State GameState ()
@@ -292,8 +290,7 @@ listCharactersAt loc ((l, name):xs) =
 talk :: String -> StateT GameState IO ()
 talk name = do
     currentState <- get
-    -- havekeys <- lift $ execStateT (haveAllKeys keys) currentState
-    havekeys <- haveAllKeys keys
+    let havekeys = haveAllKeys keys (equipment currentState)
     if name == "Jake" && havekeys
         then do
             lift $ putStrLn $ "So it is true. You need to prepare. Find Exeter to get a better weapon."
