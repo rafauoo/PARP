@@ -5,6 +5,7 @@ import Data.List (find)
 import Control.Monad.State
 import Control.Monad
 import Control.Monad.Trans
+import Control.Monad.Identity
 import Data.Maybe (isJust, fromJust, fromMaybe, maybe)
 
 data GameState = GameState
@@ -72,11 +73,11 @@ look = do
                     let addLvl = checkLvlUp loc lvlups
                     updateWeaponLvl (playerWeaponLvl currentState + addLvl)
                     removeMonster loc
-                    addKeyIfInLocation keys
+                    modify (\s -> execState (addKeyIfInLocation keys) s)
                     havekeys <- haveAllKeys keys
                     when (havekeys && (currentQuest currentState) == "Collect 3 key fragments.") $ do
                         let newConnection = ("a6", East, "a7")
-                        addConnection newConnection
+                        modify (\s -> execState (addConnection newConnection) s)
                         changeQuest "Talk to Jake in Anyor."
             else do
                 death
@@ -178,7 +179,7 @@ haveAllKeys keys = do
     return $ length (equipment currentState) == length keys
 
 
-addKeyIfInLocation :: Keys -> StateT GameState IO ()
+addKeyIfInLocation :: Keys -> State GameState ()
 addKeyIfInLocation keys = do
     currentState <- get
     let currentLoc = currentLocation currentState
@@ -186,9 +187,11 @@ addKeyIfInLocation keys = do
     put currentState {equipment = equipment currentState ++ keyincurrLoc}
 
 
-addConnection :: Connection -> StateT GameState IO ()
+addConnection :: Connection -> State GameState ()
 addConnection connection = do
-    modify (\currentState -> currentState { worldMapActual = connection : worldMapActual currentState })
+    currentState <- get
+    let updatedMap = connection : worldMapActual currentState
+    put currentState { worldMapActual = updatedMap }
 
 
 formatKey :: Key -> String
@@ -261,9 +264,7 @@ gameLoop = do
 changeQuest :: String -> StateT GameState IO ()
 changeQuest newQuest = do
     currentState <- get
-    lift $ putStrLn $ ""
-    lift $ putStrLn $ "QUEST FINISHED: " ++ currentQuest currentState
-    lift $ putStrLn $ ""
+    lift $ putStrLn $ "\nQUEST FINISHED: " ++ currentQuest currentState ++ "\n"
     put currentState { currentQuest = newQuest}
     printNewQuest
 
@@ -290,13 +291,15 @@ listCharactersAt loc ((l, name):xs) =
 
 talk :: String -> StateT GameState IO ()
 talk name = do
+    currentState <- get
+    -- havekeys <- lift $ execStateT (haveAllKeys keys) currentState
     havekeys <- haveAllKeys keys
     if name == "Jake" && havekeys
         then do
             lift $ putStrLn $ "So it is true. You need to prepare. Find Exeter to get a better weapon."
             changeQuest "Find Exeter to get a better weapon."
             let newConnection = ("g5", West, "g4")
-            addConnection newConnection
+            modify (\s -> execState (addConnection newConnection) s)
             return ()
         else do
             lift $ putStrLn $ "Cannot talk to him!"
