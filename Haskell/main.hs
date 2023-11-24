@@ -7,6 +7,7 @@ import Control.Monad
 import Control.Monad.Trans
 import Control.Monad.Identity
 import System.Random
+import System.Exit (exitSuccess)
 import Data.Maybe (isJust, fromJust, fromMaybe, maybe, isNothing)
 
 data GameState = GameState
@@ -72,6 +73,9 @@ look = do
             monsterDefeated <- combat (monsterName, monsterLevel) weaponLvl
             if monsterDefeated
                 then do
+                    when (monsterName == "FINAL BOSS - Ephemeral Phantom") $ do
+                        lift $ putStrLn $ "\nYOU FINISHED A GAME. CONGRATULATIONS!\n\n\n"
+                        liftIO exitSuccess
                     let addLvl = checkLvlUp loc lvlups
                     modify (\s -> execState (updateWeaponLvl (playerWeaponLvl currentState + addLvl)) s)
                     modify (\s -> execState (removeMonster loc) s)
