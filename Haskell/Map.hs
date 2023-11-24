@@ -193,7 +193,7 @@ randomMonsters = [
 	("a2", "Wolf", 1),
 	("a3", "Elf", 1),
 	("b2", "Elf", 1),
-  	("b3", "Wolf", 1),
+  ("b3", "Wolf", 1),
 	("b6", "Goblin", 1),
 	("c1", "Wolf", 1),
 	("c3", "Elf", 1),
@@ -202,14 +202,14 @@ randomMonsters = [
 	("d3", "Wolf", 1),
 	("d6", "Ocelot", 1),
 	("d7", "Ocelot", 1),
-  	("e2", "Lion", 1),
+  ("e2", "Lion", 1),
 	("e4", "Goblin", 1),
-  	("e6", "Drowned", 1),
+  ("e6", "Drowned", 1),
 	("f1", "Hermit", 1),
 	("f6", "Drowned", 1),
 	("f7", "Drowned", 1),
 	("g5", "Naiad", 1),
-  	("g7", "Drowned", 1)
+  ("g7", "Drowned", 1)
 	]
 
 lvlups :: LvlUps

@@ -31,6 +31,7 @@ instructionsText = [
     "s             -- go south.",
     "bag           -- see your equipment",
     "quest         -- print current quest.",
+    "talk <person> -- talk to person in location",
     ""
     ]
 
@@ -42,7 +43,7 @@ printInstructions = printLines instructionsText
 
 readCommand :: IO String
 readCommand = do
-    putStr "> "
+    putStr "\n> "
     getLine
 
 death :: StateT GameState IO ()
