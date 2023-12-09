@@ -12,7 +12,7 @@ Collaborators:
 * ..."
 
 Object subclass: Game [
-    | isGameOver currentLocation worldMap |
+    | isGameOver currentLocation worldMap eq|
 
     introductionText := #(
         'A long time ago, in a galaxy far, far away...'
@@ -23,10 +23,10 @@ Object subclass: Game [
         ''
         'instructions  -- to see these instructions.'
         'quit          -- to end the game and quit.'
-	'w	       -- go west.'
-	'n	       -- go north.'
-	'e	       -- go east.'
-	's	       -- go south.'
+        'w	       -- go west.'
+        'n	       -- go north.'
+        'e	       -- go east.'
+        's	       -- go south.'
         ''
     ).
  
@@ -39,12 +39,14 @@ Object subclass: Game [
 
     init [
         isGameOver := false.
-	currentLocation := 'd4'.
-	worldMap := GameMap new.
+	    currentLocation := 'd4'.
+	    worldMap := GameMap new.
+        eq := Array new.
     ]
 
     look [
-	| locationDescription |
+	| locationDescription key |
+        key := worldMap getKey: currentLocation.
         locationDescription := 'You are in ', (worldMap getLocationDescription: currentLocation) , ' (' , currentLocation , ')'.
         self printLines: (Array with: locationDescription).
     ]
@@ -88,21 +90,21 @@ Object subclass: Game [
 
         self printIntroduction.
         self printInstructions.
-	self look.
+	    self look.
         "Game loop."
         [isGameOver] whileFalse: [
-            isUnknown := true.
-            cmd := self readCommand.
+        isUnknown := true.
+        cmd := self readCommand.
 
-            cmd = 'instructions' ifTrue: [
-                self printInstructions.
-                isUnknown := false
-            ].
+        cmd = 'instructions' ifTrue: [
+            self printInstructions.
+            isUnknown := false
+        ].
 
-            cmd = 'quit' ifTrue: [
-                isGameOver := true.
-                isUnknown := false
-            ].
+        cmd = 'quit' ifTrue: [
+            isGameOver := true.
+            isUnknown := false
+        ].
 	
 	    cmd = 'w' ifTrue: [
 		self move: 'w'.
@@ -131,4 +133,5 @@ Object subclass: Game [
     ]
 ]
 
-Game new run.
+g := Game new.
+g run.

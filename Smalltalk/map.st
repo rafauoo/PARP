@@ -1,8 +1,8 @@
 Object subclass: GameMap [
-    | locations connections |
+    | locations connections keys|
 
     GameMap class >> new [
-        ^super new initialize
+        ^super new initialize.
     ]
 
     GameMap >> addLocation: location withDescription: description [
@@ -11,6 +11,10 @@ Object subclass: GameMap [
 
     GameMap >> addConnectionFrom: from to: to withDirection: direction [
         connections add: (Array with: from with: direction with: to).
+    ]
+
+    GameMap >> addKey: key withLocation: location [
+        keys at: location put: key.
     ]
 
     GameMap >> getLocationDescription: location [
@@ -23,57 +27,66 @@ Object subclass: GameMap [
 	^result.
     ]
 
+    GameMap >> getKey: location [
+        ^keys at: location ifAbsent: ['Not key'].
+    ]
+
     GameMap >> initialize [
         locations := Dictionary new.
         connections := OrderedCollection new.
+        keys := Dictionary new.
+
+        self addKey: 'Heartwood Key' withLocation: 'a1'.
+        self addKey: 'Divine Sigil Key' withLocation: 'g1'.
+        self addKey: 'Stoneheart Key' withLocation: 'b5'.
 
         self addLocation: 'a1' withDescription: 'Forest'.
         self addLocation: 'a2' withDescription: 'Forest'.
         self addLocation: 'a3' withDescription: 'Mountains'.
-	self addLocation: 'a4' withDescription: 'Mountains'.
-	self addLocation: 'a5' withDescription: 'Mountains'.
-	self addLocation: 'a6' withDescription: 'Valley'.
-	self addLocation: 'a7' withDescription: 'Abandoned house'.
+        self addLocation: 'a4' withDescription: 'Mountains'.
+        self addLocation: 'a5' withDescription: 'Mountains'.
+        self addLocation: 'a6' withDescription: 'Valley'.
+        self addLocation: 'a7' withDescription: 'Abandoned house'.
 
-	self addLocation: 'b1' withDescription: 'Forest'.
-	self addLocation: 'b2' withDescription: 'Forest'.
-	self addLocation: 'b3' withDescription: 'Forest'.
-	self addLocation: 'b5' withDescription: 'Cave'.
-	self addLocation: 'b6' withDescription: 'Valley'.
-	self addLocation: 'b7' withDescription: 'Mountains'.
+        self addLocation: 'b1' withDescription: 'Forest'.
+        self addLocation: 'b2' withDescription: 'Forest'.
+        self addLocation: 'b3' withDescription: 'Forest'.
+        self addLocation: 'b5' withDescription: 'Cave'.
+        self addLocation: 'b6' withDescription: 'Valley'.
+        self addLocation: 'b7' withDescription: 'Mountains'.
 
-	self addLocation: 'c1' withDescription: 'Forest'.
-	self addLocation: 'c2' withDescription: 'Forest'.
-	self addLocation: 'c3' withDescription: 'Forest'.
-	self addLocation: 'c6' withDescription: 'Valley'.
-	self addLocation: 'c7' withDescription: 'Valley'.
+        self addLocation: 'c1' withDescription: 'Forest'.
+        self addLocation: 'c2' withDescription: 'Forest'.
+        self addLocation: 'c3' withDescription: 'Forest'.
+        self addLocation: 'c6' withDescription: 'Valley'.
+        self addLocation: 'c7' withDescription: 'Valley'.
 
-	self addLocation: 'd1' withDescription: 'Savanna'.
-	self addLocation: 'd2' withDescription: 'Forest'.
-	self addLocation: 'd3' withDescription: 'Forest'.
-	self addLocation: 'd4' withDescription: 'Anyor Village'.
-	self addLocation: 'd6' withDescription: 'Savanna'.
-	self addLocation: 'd7' withDescription: 'Savanna'.
+        self addLocation: 'd1' withDescription: 'Savanna'.
+        self addLocation: 'd2' withDescription: 'Forest'.
+        self addLocation: 'd3' withDescription: 'Forest'.
+        self addLocation: 'd4' withDescription: 'Anyor Village'.
+        self addLocation: 'd6' withDescription: 'Savanna'.
+        self addLocation: 'd7' withDescription: 'Savanna'.
 
-	self addLocation: 'e1' withDescription: 'Savanna'.
-	self addLocation: 'e2' withDescription: 'Savanna'.
-	self addLocation: 'e3' withDescription: 'Fields'.
-	self addLocation: 'e4' withDescription: 'Fields'.
-	self addLocation: 'e5' withDescription: 'Bridge'.
-	self addLocation: 'e6' withDescription: 'Swamp'.
-	self addLocation: 'e7' withDescription: 'Swamp'.
+        self addLocation: 'e1' withDescription: 'Savanna'.
+        self addLocation: 'e2' withDescription: 'Savanna'.
+        self addLocation: 'e3' withDescription: 'Fields'.
+        self addLocation: 'e4' withDescription: 'Fields'.
+        self addLocation: 'e5' withDescription: 'Bridge'.
+        self addLocation: 'e6' withDescription: 'Swamp'.
+        self addLocation: 'e7' withDescription: 'Swamp'.
 
-	self addLocation: 'f1' withDescription: 'Desert'.
-	self addLocation: 'f2' withDescription: 'Desert'.
-	self addLocation: 'f6' withDescription: 'Swamp'.
-	self addLocation: 'f7' withDescription: 'Swamp'.
+        self addLocation: 'f1' withDescription: 'Desert'.
+        self addLocation: 'f2' withDescription: 'Desert'.
+        self addLocation: 'f6' withDescription: 'Swamp'.
+        self addLocation: 'f7' withDescription: 'Swamp'.
 
-	self addLocation: 'g1' withDescription: 'Temple'.
-	self addLocation: 'g2' withDescription: 'Desert'.
-	self addLocation: 'g4' withDescription: 'Exeter Village'.
-	self addLocation: 'g5' withDescription: 'Swamp'.
-	self addLocation: 'g6' withDescription: 'Swamp'.
-	self addLocation: 'g7' withDescription: 'Swamp'.
+        self addLocation: 'g1' withDescription: 'Temple'.
+        self addLocation: 'g2' withDescription: 'Desert'.
+        self addLocation: 'g4' withDescription: 'Exeter Village'.
+        self addLocation: 'g5' withDescription: 'Swamp'.
+        self addLocation: 'g6' withDescription: 'Swamp'.
+        self addLocation: 'g7' withDescription: 'Swamp'.
 
         self addConnectionFrom: 'a1' to: 'a2' withDirection: 'e'.
         self addConnectionFrom: 'a1' to: 'b1' withDirection: 's'.
