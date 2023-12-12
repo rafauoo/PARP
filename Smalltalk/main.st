@@ -56,7 +56,7 @@ Object subclass: Game [
 
     addKey: location [
         | key |
-        key := worldMap getKey: key.
+        key := worldMap getKey: location.
         key = 'Not key' ifFalse: [
             eq add: key.
         ].
