@@ -51,7 +51,7 @@ Object subclass: GameMap [
     ]
 
     GameMap >> deleteStaticMonster: location [
-        staticMonsters removeKey: location.
+        staticMonsters removeKey: location ifAbsent: [].
     ]
 
     GameMap >> checklvup: location [

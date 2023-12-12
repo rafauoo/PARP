@@ -38,15 +38,15 @@ Object subclass: Game [
         ^g
     ]
 
-    init [
+    Game >> init [
         isGameOver := false.
 	    currentLocation := 'd4'.
 	    worldMap := GameMap new.
         eq := OrderedCollection new.
-        weaponLv := 1.
+        weaponLv := 2.
     ]
 
-    look [
+    Game >> look [
 	| description monster |
         monster := worldMap getMonster: currentLocation.
         description := 'You are in ', (worldMap getLocationDescription: currentLocation), ' (', currentLocation,  ')'.
@@ -60,46 +60,61 @@ Object subclass: Game [
         ].
     ]
 
-    Game >> combat: monster on: location [
-        | monsterlv description |
-        monsterlv := monster second.
-        monsterlv > weaponLv ifTrue: [
-            description := #(
-                'You have been slain'
-                'Local medic has found your body...'
-            ).
-            self printLines: description.
-            currentLocation := 'd4'.
-            ^ self look.
-        ].    
+    Game >> dead [
+        | description |
+        description := #(
+            'You have been slain'
+            'Local medic has found your body...'
+        ).
+        self printLines: description.
+        currentLocation := 'd4'.
+        ^ self look.
     ]
 
-    addKey: location [
+    Game >> combat: monster on: location [
+        | monsterlv description key lvUp|
+        monsterlv := monster second.
+        monsterlv > weaponLv ifTrue: [
+            ^ self dead.
+        ].
+        worldMap deleteStaticMonster: location.
+        key := self addKey: location.
+        key = 'Not key' ifFalse: [
+            description := #(
+                'Key was founded. Check your bag.'
+                ''
+            ).
+            self printLines: description.
+        ].
+    ]
+
+    Game >> addKey: location [
         | key |
         key := worldMap getKey: location.
         key = 'Not key' ifFalse: [
             eq add: key.
         ].
+        ^key.
     ]
 
     "Print strings from array in separate lines."
-    printLines: anArray [
+    Game >> printLines: anArray [
         anArray do: [ :string | Transcript show: string; cr ]
     ]
 
-    printIntroduction [
+    Game >> printIntroduction [
        self printLines: introductionText.
     ]
 
-    printInstructions [
+    Game >> printInstructions [
         self printLines: instructionsText.
     ]
 
-    readCommand [
+    Game >> readCommand [
         Transcript show: '> '.
         ^ FileStream stdin nextLine
     ]
-    move: direction [
+    Game >> move: direction [
 	| filteredConnections chosenConnection |
 	filteredConnections := worldMap getConnectionsFrom: currentLocation.
 	chosenConnection := (filteredConnections select: [:conn | conn second = direction]).
@@ -115,7 +130,7 @@ Object subclass: Game [
     ]
 
     "Run the game."
-    run [
+    Game >> run [
         | cmd isUnknown |
 
         self printIntroduction.
@@ -159,7 +174,7 @@ Object subclass: Game [
         cmd = 'bag' ifTrue: [
         self printLines: #('Your equipment:').
         eq do: [ :key |
-            Transcript show: '   -', key; cr.
+            Transcript show: '  - ', key; cr.
         ].
         isUnknown := false
         ].
