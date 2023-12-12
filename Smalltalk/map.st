@@ -1,5 +1,5 @@
 Object subclass: GameMap [
-    | locations connections keys staticMonsters randomMonsters|
+    | locations connections keys staticMonsters randomMonsters lvup|
 
     GameMap class >> new [
         ^super new initialize.
@@ -43,11 +43,23 @@ Object subclass: GameMap [
         | monster lv randomInt |
         monster := randomMonsters at: location ifAbsent: [^false].
         randomInt := Random new between: 1 and: 10.
-        randomInt < 4 ifTrue: [^false].
+        randomInt > 3 ifTrue: [^false].
         lv := #(1 1 1 1 1 2 2 3 4 5).
         randomInt := Random new between: 1 and: 10.
         monster := {monster first. (lv at: randomInt)}.
         ^monster.
+    ]
+
+    GameMap >> deleteStaticMonster: location [
+        staticMonsters removeKey: location.
+    ]
+
+    GameMap >> checklvup: location [
+        (lvup includes: location) ifTrue: [
+            lvup := lvup copyWithout: location.
+            ^true.
+        ].
+        ^false.
     ]
 
     GameMap >> initialize [
@@ -56,6 +68,7 @@ Object subclass: GameMap [
         keys := Dictionary new.
         staticMonsters := Dictionary new.
         randomMonsters := Dictionary new.
+        lvup := #('c2' 'f2' 'a4' 'g4').
 
         self addKey: 'Heartwood Key' withLocation: 'a1'.
         self addKey: 'Divine Sigil Key' withLocation: 'g1'.

@@ -12,7 +12,7 @@ Collaborators:
 * ..."
 
 Object subclass: Game [
-    | isGameOver currentLocation worldMap eq|
+    | isGameOver currentLocation worldMap eq weaponLv |
 
     introductionText := #(
         'A long time ago, in a galaxy far, far away...'
@@ -23,6 +23,7 @@ Object subclass: Game [
         ''
         'instructions  -- to see these instructions.'
         'quit          -- to end the game and quit.'
+        'bag           -- to see your equipment.'
         'w	       -- go west.'
         'n	       -- go north.'
         'e	       -- go east.'
@@ -42,16 +43,35 @@ Object subclass: Game [
 	    currentLocation := 'd4'.
 	    worldMap := GameMap new.
         eq := OrderedCollection new.
+        weaponLv := 1.
     ]
 
     look [
-	| locationDescription monster |
+	| description monster |
         monster := worldMap getMonster: currentLocation.
+        description := 'You are in ', (worldMap getLocationDescription: currentLocation), ' (', currentLocation,  ')'.
+        self printLines: (Array with: description).
+        description := 'Your level: ', (weaponLv printString).
+        self printLines: (Array with: description).
         monster = false ifFalse: [
-            Transcript show: monster first, ' ', monster second printString; cr.
+            description := 'A wild ', (monster first), ' [lv ', (monster second printString), '] appears!!!'.
+            self printLines: (Array with: description).
+            self combat: monster on: currentLocation.
         ].
-        locationDescription := 'You are in ', (worldMap getLocationDescription: currentLocation) , ' (' , currentLocation , ')'.
-        self printLines: (Array with: locationDescription).
+    ]
+
+    Game >> combat: monster on: location [
+        | monsterlv description |
+        monsterlv := monster second.
+        monsterlv > weaponLv ifTrue: [
+            description := #(
+                'You have been slain'
+                'Local medic has found your body...'
+            ).
+            self printLines: description.
+            currentLocation := 'd4'.
+            ^ self look.
+        ].    
     ]
 
     addKey: location [
