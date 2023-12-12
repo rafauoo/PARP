@@ -1,5 +1,5 @@
 Object subclass: GameMap [
-    | locations connections keys|
+    | locations connections keys staticMonsters randomMonsters|
 
     GameMap class >> new [
         ^super new initialize.
@@ -15,6 +15,10 @@ Object subclass: GameMap [
 
     GameMap >> addKey: key withLocation: location [
         keys at: location put: key.
+    ]
+
+    GameMap >> addMonster: monster withLocation: location toMonsters: monsters[
+        monsters at: location put: monster.
     ]
 
     GameMap >> getLocationDescription: location [
@@ -35,6 +39,8 @@ Object subclass: GameMap [
         locations := Dictionary new.
         connections := OrderedCollection new.
         keys := Dictionary new.
+        staticMonsters := Dictionary new.
+        randomMonsters := Dictionary new.
 
         self addKey: 'Heartwood Key' withLocation: 'a1'.
         self addKey: 'Divine Sigil Key' withLocation: 'g1'.
@@ -200,5 +206,33 @@ Object subclass: GameMap [
         self addConnectionFrom: 'g6' to: 'g7' withDirection: 'e'.
         self addConnectionFrom: 'g7' to: 'f7' withDirection: 'n'.
         self addConnectionFrom: 'g7' to: 'g6' withDirection: 'w'.
+
+        self addMonster: {'MiniBoss - Druid'. 2} withLocation: 'a1' toMonsters: staticMonsters.
+        self addMonster: {'FINAL BOSS - Empheral Phantom'. 5} withLocation: 'a7' toMonsters: staticMonsters.
+        self addMonster: {'MiniBoss - Goblin'. 4} withLocation: 'b5' toMonsters: staticMonsters.
+        self addMonster: {'Elf'. 1} withLocation: 'c2' toMonsters: staticMonsters.
+        self addMonster: {'Hermit'. 1} withLocation: 'f2' toMonsters: staticMonsters.
+        self addMonster: {'MiniBoss - Undead Priest'. 3} withLocation: 'g1' toMonsters: staticMonsters.
+        self addMonster: {'River spirit'. 0} withLocation: 'a4' toMonsters: staticMonsters.
+
+        self addMonster: {'Wolf'. 1} withLocation: 'a2' toMonsters: randomMonsters.
+        self addMonster: {'Elf'. 1} withLocation: 'a3' toMonsters: randomMonsters.
+        self addMonster: {'Elf'. 1} withLocation: 'b2' toMonsters: randomMonsters.
+        self addMonster: {'Wolf'. 1} withLocation: 'b3' toMonsters: randomMonsters.
+        self addMonster: {'Wolf'. 1} withLocation: 'c1' toMonsters: randomMonsters.
+        self addMonster: {'Elf'. 1} withLocation: 'c3' toMonsters: randomMonsters.
+        self addMonster: {'Goblin'. 1} withLocation: 'c6' toMonsters: randomMonsters.
+        self addMonster: {'Ocelot'. 1} withLocation: 'd1' toMonsters: randomMonsters.
+        self addMonster: {'Wolf'. 1} withLocation: 'd3' toMonsters: randomMonsters.
+        self addMonster: {'Ocelot'. 1} withLocation: 'd6' toMonsters: randomMonsters.
+        self addMonster: {'Ocelot'. 1} withLocation: 'd7' toMonsters: randomMonsters.
+        self addMonster: {'Lion'. 1} withLocation: 'e2' toMonsters: randomMonsters.
+        self addMonster: {'Goblin'. 1} withLocation: 'e4' toMonsters: randomMonsters.
+        self addMonster: {'Drowned'. 1} withLocation: 'e6' toMonsters: randomMonsters.
+        self addMonster: {'Hermit'. 1} withLocation: 'f1' toMonsters: randomMonsters.
+        self addMonster: {'Drowned'. 1} withLocation: 'f6' toMonsters: randomMonsters.
+        self addMonster: {'Drowned'. 1} withLocation: 'f7' toMonsters: randomMonsters.
+        self addMonster: {'Naiad'. 1} withLocation: 'g5' toMonsters: randomMonsters.
+        self addMonster: {'Drowned'. 1} withLocation: 'g7' toMonsters: randomMonsters.
     ]
 ]
