@@ -43,11 +43,11 @@ Object subclass: Game [
 	    currentLocation := 'd4'.
 	    worldMap := GameMap new.
         eq := OrderedCollection new.
-        weaponLv := 2.
+        weaponLv := 1.
     ]
 
     Game >> look [
-	| description monster |
+	| description monster lvUp|
         monster := worldMap getMonster: currentLocation.
         description := 'You are in ', (worldMap getLocationDescription: currentLocation), ' (', currentLocation,  ')'.
         self printLines: (Array with: description).
@@ -58,6 +58,12 @@ Object subclass: Game [
             self printLines: (Array with: description).
             self combat: monster on: currentLocation.
         ].
+        lvUp := worldMap checklvup: currentLocation.
+        lvUp ifTrue: [
+            weaponLv := weaponLv + 1.
+            description := 'Weapon upgrade has been found. Your level: ', weaponLv printString.
+            self printLines: (Array with: description).
+        ].
     ]
 
     Game >> dead [
@@ -65,6 +71,7 @@ Object subclass: Game [
         description := #(
             'You have been slain'
             'Local medic has found your body...'
+            ''
         ).
         self printLines: description.
         currentLocation := 'd4'.
@@ -72,12 +79,16 @@ Object subclass: Game [
     ]
 
     Game >> combat: monster on: location [
-        | monsterlv description key lvUp|
+        | monsterlv description key|
         monsterlv := monster second.
+        description := 'You are fighting with ', monster first.
+        self printLines: (Array with: description).
         monsterlv > weaponLv ifTrue: [
             ^ self dead.
         ].
         worldMap deleteStaticMonster: location.
+        description := 'You have slain ', monster first.
+        self printLines: (Array with: description).
         key := self addKey: location.
         key = 'Not key' ifFalse: [
             description := #(
