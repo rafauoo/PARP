@@ -41,16 +41,22 @@ Object subclass: Game [
         isGameOver := false.
 	    currentLocation := 'd4'.
 	    worldMap := GameMap new.
-        eq := Array new.
+        eq := OrderedCollection new.
     ]
 
     look [
 	| locationDescription key |
         key := worldMap getKey: currentLocation.
+        self addKey: key.
         locationDescription := 'You are in ', (worldMap getLocationDescription: currentLocation) , ' (' , currentLocation , ')'.
         self printLines: (Array with: locationDescription).
     ]
 
+    addKey: key [
+        key = 'Not key' ifFalse: [
+            eq add: key.
+        ].
+    ]
 
     "Print strings from array in separate lines."
     printLines: anArray [
@@ -125,10 +131,18 @@ Object subclass: Game [
 		self move: 'e'.
 		isUnknown := false
 	    ].
-                
-            isUnknown ifTrue: [
-                self printLines: #('Unknown command.' '')
-            ].
+
+        cmd = 'bag' ifTrue: [
+        self printLines: #('Your equipment:').
+        eq do: [ :key |
+            Transcript show: '   -', key; cr.
+        ].
+        isUnknown := false
+        ].
+
+        isUnknown ifTrue: [
+        self printLines: #('Unknown command.' '')
+        ].
         ].
     ]
 ]
