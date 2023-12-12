@@ -35,6 +35,21 @@ Object subclass: GameMap [
         ^keys at: location ifAbsent: ['Not key'].
     ]
 
+    GameMap >> getMonster: location [
+        ^staticMonsters at: location ifAbsent: [self getRandomMonster: location].
+    ]
+
+    GameMap >> getRandomMonster: location [
+        | monster lv randomInt |
+        monster := randomMonsters at: location ifAbsent: [^false].
+        randomInt := Random new between: 1 and: 10.
+        randomInt < 4 ifTrue: [^false].
+        lv := #(1 1 1 1 1 2 2 3 4 5).
+        randomInt := Random new between: 1 and: 10.
+        monster := {monster first. (lv at: randomInt)}.
+        ^monster.
+    ]
+
     GameMap >> initialize [
         locations := Dictionary new.
         connections := OrderedCollection new.

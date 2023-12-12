@@ -45,14 +45,18 @@ Object subclass: Game [
     ]
 
     look [
-	| locationDescription key |
-        key := worldMap getKey: currentLocation.
-        self addKey: key.
+	| locationDescription monster |
+        monster := worldMap getMonster: currentLocation.
+        monster = false ifFalse: [
+            Transcript show: monster first, ' ', monster second printString; cr.
+        ].
         locationDescription := 'You are in ', (worldMap getLocationDescription: currentLocation) , ' (' , currentLocation , ')'.
         self printLines: (Array with: locationDescription).
     ]
 
-    addKey: key [
+    addKey: location [
+        | key |
+        key := worldMap getKey: key.
         key = 'Not key' ifFalse: [
             eq add: key.
         ].
