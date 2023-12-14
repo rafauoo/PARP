@@ -15,7 +15,11 @@ Object subclass: Game [
     | isGameOver currentLocation worldMap eq weaponLv |
 
     introductionText := #(
-        'A long time ago, in a galaxy far, far away...'
+        'In a realm veiled by ancient lore, three guardians protected fragments of a mysterious key.'
+        'Druid guarded the forest, the Undead Priest watched over the temple, and a formidable Goblin held the key fragment in treacherous caves.'
+        'Legends whispered of an elusive entity, the Ephemeral Phantom, residing in the abandoned house, said to hold the power to shape the realm''s destiny.'
+        'Only a brave soul could confront this being and determine the realm''s fate.'
+        ''
     ).
 
     instructionsText := #(
@@ -63,6 +67,9 @@ Object subclass: Game [
             weaponLv := weaponLv + 1.
             description := 'Weapon upgrade has been found. Your level: ', weaponLv printString.
             self printLines: (Array with: description).
+            weaponLv = 4 ifTrue: [
+                worldMap addConnectionFrom: 'g5' to: 'g4' withDirection: 'w'.                
+            ].
         ].
     ]
 
@@ -89,6 +96,11 @@ Object subclass: Game [
         worldMap deleteStaticMonster: location.
         description := 'You have slain ', monster first.
         self printLines: (Array with: description).
+        monster first = 'FINAL BOSS - Empheral Phantom' ifTrue: [
+            description := 'YOU FINISHED THE GAME. CONGRATULATIONS!'.
+            self printLines: (Array with: description).
+            isGameOver := true.
+        ].
         key := self addKey: location.
         key = 'Not key' ifFalse: [
             description := #(
@@ -96,6 +108,9 @@ Object subclass: Game [
                 ''
             ).
             self printLines: description.
+            eq size = 3 ifTrue: [
+                worldMap addConnectionFrom: 'a6' to: 'a7' withDirection: 'e'.
+            ].
         ].
     ]
 
