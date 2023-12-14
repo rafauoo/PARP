@@ -12,7 +12,7 @@ Collaborators:
 * ..."
 
 Object subclass: Game [
-    | isGameOver currentLocation worldMap eq weaponLv |
+    | currentQuest isGameOver currentLocation worldMap eq weaponLv |
 
     introductionText := #(
         'In a realm veiled by ancient lore, three guardians protected fragments of a mysterious key.'
@@ -32,7 +32,7 @@ Object subclass: Game [
         'n	       -- go north.'
         'e	       -- go east.'
         's	       -- go south.'
-        ''
+        'quest	       -- print current quest'
     ).
  
     Game class >> new [
@@ -42,12 +42,28 @@ Object subclass: Game [
         ^g
     ]
 
+    Game >> changeQuest: newQuest [
+	| desc |
+	desc := 'QUEST FINISHED: ', currentQuest.
+	self printLines: (Array with: desc).
+	desc := 'NEW QUEST ADDED: ', newQuest.
+	self printLines: (Array with: desc).
+	currentQuest := newQuest.
+    ]
+    
+    Game >> printQuest [
+	| desc |
+	desc := 'CURRENT QUEST: ', currentQuest.
+	self printLines: (Array with: desc).
+    ] 
+
     Game >> init [
         isGameOver := false.
 	    currentLocation := 'd4'.
 	    worldMap := GameMap new.
         eq := OrderedCollection new.
         weaponLv := 1.
+	currentQuest := 'Collect 3 key fragments.'.
     ]
 
     Game >> look [
@@ -70,6 +86,9 @@ Object subclass: Game [
             weaponLv = 4 ifTrue: [
                 worldMap addConnectionFrom: 'g5' to: 'g4' withDirection: 'w'.                
             ].
+	    weaponLv = 5 ifTrue: [
+		self changeQuest: 'Kill Empheral Phantom.'.
+	    ].
         ].
     ]
 
@@ -104,12 +123,13 @@ Object subclass: Game [
         key := self addKey: location.
         key = 'Not key' ifFalse: [
             description := #(
-                'Key was founded. Check your bag.'
+                'Key was found. Check your bag.'
                 ''
             ).
             self printLines: description.
             eq size = 3 ifTrue: [
                 worldMap addConnectionFrom: 'a6' to: 'a7' withDirection: 'e'.
+		self changeQuest: 'Find Exeter to get a better weapon.'.
             ].
         ].
     ]
@@ -157,11 +177,12 @@ Object subclass: Game [
 
     "Run the game."
     Game >> run [
-        | cmd isUnknown |
+        | cmd isUnknown newQuest |
 
         self printIntroduction.
         self printInstructions.
 	    self look.
+	self printQuest.
         "Game loop."
         [isGameOver] whileFalse: [
         isUnknown := true.
@@ -194,6 +215,11 @@ Object subclass: Game [
 
 	    cmd = 'e' ifTrue: [
 		self move: 'e'.
+		isUnknown := false
+	    ].
+
+	    cmd = 'quest' ifTrue: [
+		self printQuest.
 		isUnknown := false
 	    ].
 
